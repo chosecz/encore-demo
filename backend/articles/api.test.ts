@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { article, articles, create, remove, update } from "./api";
+import { article, create, list, remove, update } from "./api";
 
 // Store the article ID for use across tests
 let testArticleId: string;
@@ -15,7 +15,7 @@ describe("Article API Tests", () => {
   });
 
   test("should return all articles", async () => {
-    const resp = await articles({ includeDeleted: true });
+    const resp = await list({ includeDeleted: true });
     expect(resp.articles).toBeDefined();
     expect(resp.articles.length).toBeGreaterThan(0);
   });

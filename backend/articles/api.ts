@@ -11,8 +11,8 @@ import { api, APIError } from "encore.dev/api";
 import { db } from "./db";
 
 // Return all articles
-export const articles = api(
-  { expose: true, method: "GET", path: "/articles" },
+export const list = api(
+  { expose: true, method: "GET", path: "/list" },
   async ({
     includeDeleted = false,
   }: {
