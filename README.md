@@ -1,6 +1,6 @@
 # Groupon Encore.dev DEMO project
 
-Description: This is a demo project for Groupon using Encore.dev. It is a simple API for managing articles.
+This is a demo project for Groupon using Encore.dev. It is a simple API for managing articles.
 
 ## Prerequisites
 
