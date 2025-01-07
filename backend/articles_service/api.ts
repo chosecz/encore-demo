@@ -12,7 +12,7 @@ import { db } from "./db";
 
 // Return all articles
 export const list = api(
-  { expose: true, method: "GET", path: "/list" },
+  { expose: true, method: "GET", path: "/articles" },
   async ({
     includeDeleted = false,
   }: {
@@ -32,7 +32,7 @@ export const list = api(
 
 // Return a single article or 404 if not found
 export const article = api(
-  { expose: true, method: "GET", path: "/article/:id" },
+  { expose: true, method: "GET", path: "/articles/:id" },
   async ({ id }: { id: string }): Promise<Article> => {
     const article =
       await db.queryRow<Article>`SELECT * FROM article WHERE id = ${id} AND deleted_at IS NULL`;
@@ -45,7 +45,7 @@ export const article = api(
 
 // Create a new article
 export const create = api(
-  { expose: true, method: "POST", path: "/article" },
+  { expose: true, method: "POST", path: "/articles" },
   async ({
     title,
     description,
@@ -64,7 +64,7 @@ export const create = api(
 
 // Update an existing article
 export const update = api(
-  { expose: true, method: "PUT", path: "/article/:id" },
+  { expose: true, method: "PUT", path: "/articles/:id" },
   async ({
     id,
     title,
@@ -77,7 +77,7 @@ export const update = api(
 
 // Delete an existing article
 export const remove = api(
-  { expose: true, method: "DELETE", path: "/article/:id" },
+  { expose: true, method: "DELETE", path: "/articles/:id" },
   async ({ id }: { id: string }): Promise<DeleteArticleResponse> => {
     await db.exec`UPDATE article SET deleted_at = NOW() WHERE id = ${id}`;
     return { message: "Article deleted" };
