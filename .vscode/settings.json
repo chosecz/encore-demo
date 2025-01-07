@@ -1,0 +1,12 @@
+{
+  "svelte.enable-ts-plugin": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "typescript.tsdk": "node_modules/typescript/lib.es2022.d.ts",
+  "vitest.commandLine": "encore test"
+}

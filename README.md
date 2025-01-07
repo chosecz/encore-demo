@@ -1,21 +1,14 @@
-# REST API Starter
+# Groupon Encore.dev DEMO project
 
-This is a RESTful API Starter with a single Hello World API endpoint.
+Description: This is a demo project for Groupon using Encore.dev. It is a simple API for managing articles.
 
-## Prerequisites 
+## Prerequisites
 
 **Install Encore:**
+
 - **macOS:** `brew install encoredev/tap/encore`
 - **Linux:** `curl -L https://encore.dev/install.sh | bash`
 - **Windows:** `iwr https://encore.dev/install.ps1 | iex`
-
-## Create app
-
-Create a local app from this template:
-
-```bash
-encore app create my-app-name --example=ts/hello-world
-```
 
 ## Run app locally
 
@@ -24,12 +17,13 @@ Run this command from your application's root folder:
 ```bash
 encore run
 ```
+
 ## Using the API
 
 To see that your app is running, you can ping the API.
 
 ```bash
-curl http://localhost:4000/hello/World
+curl http://localhost:4000/articles
 ```
 
 ## Local Development Dashboard
@@ -67,7 +61,6 @@ Follow these steps to link your app to GitHub:
 5. Commit and push a change to GitHub to trigger a deploy.
 
 [Learn more in the docs](https://encore.dev/docs/how-to/github)
-
 
 ## Testing
 

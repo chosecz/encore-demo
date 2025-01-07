@@ -1,0 +1,56 @@
+import { describe, expect, test } from "vitest";
+import {
+  article,
+  articles,
+  createArticle,
+  deleteArticle,
+  updateArticle,
+} from "./api";
+
+// Store the article ID for use across tests
+let testArticleId: string;
+
+describe("Article API Tests", () => {
+  test("should create an article", async () => {
+    const resp = await createArticle({
+      title: "Test Article",
+      description: "This is a test article",
+    });
+    expect(resp.id).toBeDefined();
+    testArticleId = resp.id;
+  });
+
+  test("should return all articles", async () => {
+    const resp = await articles();
+    expect(resp.articles).toBeDefined();
+    expect(resp.articles.length).toBeGreaterThan(0);
+  });
+
+  test("should return a single article", async () => {
+    const resp = await article({ id: testArticleId });
+    expect(resp.id).toBeDefined();
+    expect(resp.title).toBe("Test Article");
+    expect(resp.description).toBe("This is a test article");
+  });
+
+  test("should update an article", async () => {
+    const resp = await updateArticle({
+      id: testArticleId,
+      title: "Updated Test Article",
+      description: "This is an updated test article",
+    });
+    expect(resp.message).toBe("Article updated");
+  });
+
+  test("should return a single updated article", async () => {
+    const resp = await article({ id: testArticleId });
+    expect(resp.id).toBeDefined();
+    expect(resp.title).toBe("Updated Test Article");
+    expect(resp.description).toBe("This is an updated test article");
+  });
+
+  test("should delete the test article", async () => {
+    const resp = await deleteArticle({ id: testArticleId });
+    expect(resp.message).toBe("Article deleted");
+  });
+});
