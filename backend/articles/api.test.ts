@@ -1,18 +1,12 @@
 import { describe, expect, test } from "vitest";
-import {
-  article,
-  articles,
-  createArticle,
-  deleteArticle,
-  updateArticle,
-} from "./api";
+import { article, articles, create, remove, update } from "./api";
 
 // Store the article ID for use across tests
 let testArticleId: string;
 
 describe("Article API Tests", () => {
   test("should create an article", async () => {
-    const resp = await createArticle({
+    const resp = await create({
       title: "Test Article",
       description: "This is a test article",
     });
@@ -21,7 +15,7 @@ describe("Article API Tests", () => {
   });
 
   test("should return all articles", async () => {
-    const resp = await articles();
+    const resp = await articles({ includeDeleted: true });
     expect(resp.articles).toBeDefined();
     expect(resp.articles.length).toBeGreaterThan(0);
   });
@@ -34,7 +28,7 @@ describe("Article API Tests", () => {
   });
 
   test("should update an article", async () => {
-    const resp = await updateArticle({
+    const resp = await update({
       id: testArticleId,
       title: "Updated Test Article",
       description: "This is an updated test article",
@@ -50,7 +44,7 @@ describe("Article API Tests", () => {
   });
 
   test("should delete the test article", async () => {
-    const resp = await deleteArticle({ id: testArticleId });
+    const resp = await remove({ id: testArticleId });
     expect(resp.message).toBe("Article deleted");
   });
 });
