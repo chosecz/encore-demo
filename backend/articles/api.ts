@@ -6,6 +6,7 @@ import {
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
+  PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "./types";
@@ -18,15 +19,21 @@ export const list = api(
   }: {
     includeDeleted?: boolean;
   }): Promise<AllArticlesResponse> => {
-    const query = includeDeleted
-      ? await db.query<Article>`SELECT * FROM article`
-      : await db.query<Article>`SELECT * FROM article WHERE deleted_at IS NULL`;
+    try {
+      const query = includeDeleted
+        ? await db.query<Article>`SELECT * FROM article`
+        : await db.query<Article>`SELECT * FROM article WHERE deleted_at IS NULL`;
 
-    const articles: Article[] = [];
-    for await (const article of query) {
-      articles.push(article);
+      const articles: Article[] = [];
+      for await (const article of query) {
+        articles.push(article);
+      }
+      return { articles };
+    } catch (error) {
+      throw APIError.internal("Failed to list articles").withDetails({
+        message: (error as Error).message,
+      });
     }
-    return { articles };
   }
 );
 
@@ -50,15 +57,21 @@ export const create = api(
     title,
     description,
   }: CreateArticleRequest): Promise<CreateArticleResponse> => {
-    const result = await db.queryRow<{ id: string }>`
-      INSERT INTO article (title, description)
-      VALUES (${title}, ${description})
-      RETURNING id
+    try {
+      const result = await db.queryRow<{ id: string }>`
+        INSERT INTO article (title, description)
+        VALUES (${title}, ${description})
+        RETURNING id
     `;
-    if (!result) {
-      throw APIError.internal("Failed to create article");
+      if (!result) {
+        throw APIError.internal("Failed to create article");
+      }
+      return { id: result.id, message: "Article created" };
+    } catch (error) {
+      throw APIError.internal("Failed to create article").withDetails({
+        message: (error as Error).message,
+      });
     }
-    return { id: result.id, message: "Article created" };
   }
 );
 
@@ -70,8 +83,28 @@ export const update = api(
     title,
     description,
   }: UpdateArticleRequest): Promise<UpdateArticleResponse> => {
-    await db.exec`UPDATE article SET title = ${title}, description = ${description}, updated_at = NOW() WHERE id = ${id}`;
-    return { message: "Article updated" };
+    try {
+      await db.exec`UPDATE article SET title = ${title}, description = ${description}, updated_at = NOW() WHERE id = ${id}`;
+      return { message: "Article updated" };
+    } catch (error) {
+      throw APIError.internal("Failed to update article").withDetails({
+        message: (error as Error).message,
+      });
+    }
+  }
+);
+
+export const publish = api(
+  { expose: true, method: "POST", path: "/articles/:id/publish" },
+  async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
+    try {
+      await db.exec`UPDATE article SET status = 'published', updated_at = NOW() WHERE id = ${id}`;
+      return { message: "Article published" };
+    } catch (error) {
+      throw APIError.internal("Failed to publish article").withDetails({
+        message: (error as Error).message,
+      });
+    }
   }
 );
 
@@ -79,37 +112,13 @@ export const update = api(
 export const remove = api(
   { expose: true, method: "DELETE", path: "/articles/:id" },
   async ({ id }: { id: string }): Promise<DeleteArticleResponse> => {
-    await db.exec`UPDATE article SET deleted_at = NOW() WHERE id = ${id}`;
-    return { message: "Article deleted" };
+    try {
+      await db.exec`UPDATE article SET deleted_at = NOW() WHERE id = ${id}`;
+      return { message: "Article deleted" };
+    } catch (error) {
+      throw APIError.internal("Failed to delete article").withDetails({
+        message: (error as Error).message,
+      });
+    }
   }
 );
-
-// ==================================================================
-
-// Encore comes with a built-in development dashboard for
-// exploring your API, viewing documentation, debugging with
-// distributed tracing, and more. Visit your API URL in the browser:
-//
-//     http://localhost:9400
-//
-
-// ==================================================================
-
-// Next steps
-//
-// 1. Deploy your application to the cloud
-//
-//     git add -A .
-//     git commit -m 'Commit message'
-//     git push encore
-//
-// 2. To continue exploring Encore, check out these topics in docs:
-//
-//    Building a REST API:   https://encore.dev/docs/ts/tutorials/rest-api
-//    Creating Services:      https://encore.dev/docs/ts/primitives/services
-//    Creating APIs:         https://encore.dev/docs/ts/primitives/defining-apis
-//    Using SQL Databases:        https://encore.dev/docs/ts/primitives/databases
-//    Using Pub/Sub:         https://encore.dev/docs/ts/primitives/pubsub
-//    Authenticating users:  https://encore.dev/docs/ts/develop/auth
-//    Using Cron Jobs: https://encore.dev/docs/ts/primitives/cron-jobs
-//    Using Secrets: https://encore.dev/docs/ts/primitives/secrets

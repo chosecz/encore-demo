@@ -35,3 +35,7 @@ export interface UpdateArticleResponse {
 export interface DeleteArticleResponse {
   message: string;
 }
+
+export interface PublishArticleResponse {
+  message: string;
+}

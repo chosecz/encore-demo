@@ -4,6 +4,8 @@ import log from "encore.dev/log";
 import { Resend } from "resend";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
+const resendApiKey = secret("RESEND_API_KEY");
+
 // Send an email
 export const sendEmail = api(
   { expose: true, method: "POST", path: "/email/send" },
@@ -13,9 +15,8 @@ export const sendEmail = api(
     html,
     text,
   }: SendEmailRequest): Promise<SendEmailResponse> => {
-    log.info("Sending email", { email, subject });
+    log.info("Received request to send email", { email, subject });
 
-    const resendApiKey = secret("RESEND_API_KEY");
     const resend = new Resend(resendApiKey());
 
     const { data, error } = await resend.emails.send({
@@ -28,10 +29,12 @@ export const sendEmail = api(
 
     if (error) {
       log.error("Error sending email", { error });
-      throw APIError.internal(error.message, error);
+      throw APIError.internal("Failed to send email").withDetails({
+        message: error.message,
+      });
     }
 
-    log.info("Email sent", { id: data?.id });
+    log.info("Email successfully sent", { id: data?.id });
     return {
       id: data?.id,
       success: true,
