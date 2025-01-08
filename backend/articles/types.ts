@@ -16,7 +16,7 @@ export interface Article {
   id: string;
   title: string;
   description: string;
-  status: string;
+  status: "draft" | "published" | "archived";
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -42,4 +42,9 @@ export interface PublishArticleResponse {
 
 export interface PublishArticleEvent {
   articleID: string;
+}
+
+export interface ListArticlesRequest {
+  includeDeleted?: boolean;
+  status?: "draft" | "published" | "archived";
 }

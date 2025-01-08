@@ -8,6 +8,7 @@ import {
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
+  ListArticlesRequest,
   PublishArticleEvent,
   PublishArticleResponse,
   UpdateArticleRequest,
@@ -19,14 +20,35 @@ export const articles = api(
   { expose: true, method: "GET", path: "/articles" },
   async ({
     includeDeleted = false,
-  }: {
-    includeDeleted?: boolean;
-  }): Promise<AllArticlesResponse> => {
-    log.info("Received request to list articles", { includeDeleted });
+    status,
+  }: ListArticlesRequest): Promise<AllArticlesResponse> => {
+    log.info("Received request to list articles", {
+      includeDeleted,
+      status,
+    });
     try {
-      const query = includeDeleted
-        ? await db.query<Article>`SELECT * FROM article`
-        : await db.query<Article>`SELECT * FROM article WHERE deleted_at IS NULL`;
+      let query;
+      if (status && includeDeleted) {
+        query = await db.query<Article>`
+          SELECT * FROM article
+          WHERE status = ${status}
+        `;
+      } else if (status) {
+        query = await db.query<Article>`
+          SELECT * FROM article
+          WHERE status = ${status}
+          AND deleted_at IS NULL
+        `;
+      } else if (includeDeleted) {
+        query = await db.query<Article>`
+          SELECT * FROM article
+        `;
+      } else {
+        query = await db.query<Article>`
+          SELECT * FROM article
+          WHERE deleted_at IS NULL
+        `;
+      }
 
       const articles: Article[] = [];
       for await (const article of query) {

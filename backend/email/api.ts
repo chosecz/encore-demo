@@ -46,7 +46,7 @@ export const sendEmail = api(
   }
 );
 
-const _ = new Subscription(publishArticle, "send-published-article-email", {
+const _ = new Subscription(publishArticle, "send-notification-email", {
   handler: async (event: PublishArticleEvent) => {
     log.info("Received event to send email for published article", {
       articleID: event.articleID,
