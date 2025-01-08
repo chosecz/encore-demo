@@ -4,7 +4,8 @@ import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
 import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
-import { article, publishArticle } from "../articles/api";
+import { articles } from "~encore/clients";
+import { publishArticle } from "../articles/api";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
@@ -47,7 +48,7 @@ export const sendEmail = api(
 
 const _ = new Subscription(publishArticle, "send-published-article-email", {
   handler: async (event: PublishArticleEvent) => {
-    const _article = await article({ id: event.articleID });
+    const _article = await articles.article({ id: event.articleID });
 
     // Send notification email
     const { id, success } = await sendEmail({
