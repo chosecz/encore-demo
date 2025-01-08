@@ -1,3 +1,5 @@
+import { api, APIError } from "encore.dev/api";
+import { db } from "./db";
 import {
   AllArticlesResponse,
   Article,
@@ -6,9 +8,7 @@ import {
   DeleteArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
-} from "@articles/types";
-import { api, APIError } from "encore.dev/api";
-import { db } from "./db";
+} from "./types";
 
 // Return all articles
 export const list = api(

@@ -1,5 +1,5 @@
-import { SendEmailRequest } from "@email/types";
 import { api } from "encore.dev/api";
+import { SendEmailRequest } from "./types";
 
 // Send an email
 export const sendEmail = api(
