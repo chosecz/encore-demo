@@ -48,7 +48,16 @@ export const sendEmail = api(
 
 const _ = new Subscription(publishArticle, "send-published-article-email", {
   handler: async (event: PublishArticleEvent) => {
+    log.info("Received event to send email for published article", {
+      articleID: event.articleID,
+    });
     const _article = await articles.article({ id: event.articleID });
+    if (!_article) {
+      log.error("Article not found", { articleID: event.articleID });
+      throw APIError.notFound("Article not found").withDetails({
+        articleID: event.articleID,
+      });
+    }
 
     // Send notification email
     const { id, success } = await sendEmail({
@@ -59,10 +68,13 @@ const _ = new Subscription(publishArticle, "send-published-article-email", {
     });
 
     if (!success) {
+      log.error("Failed to send email", { emailID: id, success });
       throw APIError.internal("Failed to send email").withDetails({
         message: "Failed to send email",
       });
     }
+
+    log.info("Message processed successfully");
 
     return { id, message: "Email sent" };
   },
