@@ -39,3 +39,7 @@ export interface DeleteArticleResponse {
 export interface PublishArticleResponse {
   message: string;
 }
+
+export interface PublishArticleEvent {
+  articleID: string;
+}

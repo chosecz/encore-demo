@@ -1,7 +1,10 @@
+import { PublishArticleEvent } from "@articles/types";
 import { api, APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
+import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
+import { article, publishArticle } from "../articles/api";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
@@ -41,3 +44,25 @@ export const sendEmail = api(
     };
   }
 );
+
+const _ = new Subscription(publishArticle, "send-published-article-email", {
+  handler: async (event: PublishArticleEvent) => {
+    const _article = await article({ id: event.articleID });
+
+    // Send notification email
+    const { id, success } = await sendEmail({
+      email: ["josef.sima@gmail.com"],
+      subject: `Article published (id: ${_article.id})`,
+      html: `<p>Article "${_article.title}" has been published</p>`,
+      text: `Article "${_article.title}" has been published`,
+    });
+
+    if (!success) {
+      throw APIError.internal("Failed to send email").withDetails({
+        message: "Failed to send email",
+      });
+    }
+
+    return { id, message: "Email sent" };
+  },
+});

@@ -1,4 +1,5 @@
 import { api, APIError } from "encore.dev/api";
+import { Topic } from "encore.dev/pubsub";
 import { db } from "./db";
 import {
   AllArticlesResponse,
@@ -6,6 +7,7 @@ import {
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
+  PublishArticleEvent,
   PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
@@ -99,6 +101,10 @@ export const publish = api(
   async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
     try {
       await db.exec`UPDATE article SET status = 'published', updated_at = NOW() WHERE id = ${id}`;
+
+      // publish to pubsub
+      publishArticle.publish({ articleID: id });
+
       return { message: "Article published" };
     } catch (error) {
       throw APIError.internal("Failed to publish article").withDetails({
@@ -120,5 +126,12 @@ export const remove = api(
         message: (error as Error).message,
       });
     }
+  }
+);
+
+export const publishArticle = new Topic<PublishArticleEvent>(
+  "publish-article",
+  {
+    deliveryGuarantee: "at-least-once",
   }
 );
