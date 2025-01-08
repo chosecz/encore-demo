@@ -4,8 +4,6 @@ import log from "encore.dev/log";
 import { Resend } from "resend";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
-const resendApiKey = secret("RESEND_API_KEY");
-
 // Send an email
 export const sendEmail = api(
   { expose: true, method: "POST", path: "/email/send" },
@@ -16,7 +14,10 @@ export const sendEmail = api(
     text,
   }: SendEmailRequest): Promise<SendEmailResponse> => {
     log.info("Sending email", { email, subject });
+
+    const resendApiKey = secret("RESEND_API_KEY");
     const resend = new Resend(resendApiKey());
+
     const { data, error } = await resend.emails.send({
       from: "Groupon <noreply@sonic.suprovoucher.com>",
       to: email,
