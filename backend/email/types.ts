@@ -1,5 +1,11 @@
 export interface SendEmailRequest {
-  email: string;
+  email: string[];
   subject: string;
-  body: string;
+  html: string;
+  text: string;
+}
+
+export interface SendEmailResponse {
+  id?: string;
+  success: boolean;
 }
