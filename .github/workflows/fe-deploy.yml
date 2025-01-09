@@ -2,6 +2,7 @@ name: Svelte FE Deploy
 on:
   push:
     branches:
+      - main
       - staging
     paths:
       - "frontend/svelte/**"
@@ -9,7 +10,7 @@ on:
 jobs:
   test-build-deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     env:
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GCP_SERVICE_ID: ${{ vars.GCP_SERVICE_ID }}
