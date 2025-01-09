@@ -21,12 +21,13 @@ jobs:
         with:
           node-version: lts/*
       - name: Install dependencies
+        working-directory: frontend/svelte
         run: npm ci
-      # - name: Run tests
-      #   run: npm run test
       - name: Build app
+        working-directory: frontend/svelte
         run: npm run build
       - name: Copy necessary files to build directory
+        working-directory: frontend/svelte
         run: cp package*.json Dockerfile build
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
