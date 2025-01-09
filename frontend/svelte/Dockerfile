@@ -1,16 +1,14 @@
-FROM node:20-alpine AS builder
+# Use the official slim Debian Node.js image
+FROM node:lts-slim
+# Set the working directory
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+# Copy the built app into the working directory
 COPY . .
-RUN npm run build
-RUN npm prune --production
-
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/build build/
-COPY --from=builder /app/node_modules node_modules/
-COPY package.json .
-EXPOSE 3000
+# Set the environment to production
 ENV NODE_ENV=production
-CMD [ "node", "build" ]
+# Install the app's production dependencies
+RUN npm ci
+# Set the user to the node user
+USER node
+# Run index.js
+CMD ["node", "build"]
