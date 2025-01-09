@@ -1,0 +1,40 @@
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - "frontend/svelte/**"
+
+jobs:
+  test-build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_SERVICE_ID: ${{ vars.GCP_SERVICE_ID }}
+      GCP_SERVICE_REGION: ${{ vars.GCP_SERVICE_REGION }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+      # - name: Run tests
+      #   run: npm run test
+      - name: Build app
+        run: npm run build
+      - name: Copy necessary files to build directory
+        run: cp package*.json Dockerfile build
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Install Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Clean up old versions
+        run: (gcloud container images list-tags "$GCP_SERVICE_REGION-docker.pkg.dev/$GCP_PROJECT_ID/cloud-run-source-deploy/$GCP_SERVICE_ID" --filter='-tags:*' --format='get(digest)' --limit=unlimited | awk '{print "'"$GCP_SERVICE_REGION"'-docker.pkg.dev/'"$GCP_PROJECT_ID"'/cloud-run-source-deploy/'"$GCP_SERVICE_ID"'@" $1}' | xargs gcloud container images delete --quiet) || true
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy "$GCP_SERVICE_ID" --source build --platform managed --memory 128Mi --region "$GCP_SERVICE_REGION" --allow-unauthenticated --project "$GCP_PROJECT_ID"
