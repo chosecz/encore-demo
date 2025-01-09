@@ -8,8 +8,8 @@
     "types": ["node"],
     "paths": {
       "~encore/*": ["./encore.gen/*"],
-      "@articles/*": ["./backend/articles/*"],
-      "@email/*": ["./backend/email/*"]
+      "@articles/*": ["./articles/*"],
+      "@email/*": ["./email/*"]
     },
 
     /* Workspace Settings */
