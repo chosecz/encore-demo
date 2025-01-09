@@ -1,4 +1,4 @@
-name: Fly Deploy
+name: Svelte FE Deploy
 on:
   push:
     branches:
