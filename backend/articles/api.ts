@@ -136,7 +136,7 @@ export const publish = api(
 
       // publish to pubsub
       log.info("Publishing article to pubsub", { articleID: id });
-      const messageId = await publishArticle.publish({ articleID: id });
+      const messageId = await PublishedArticleTopic.publish({ articleID: id });
       log.info("Published article to pubsub", { articleID: id, messageId });
 
       return { message: "Article published" };
@@ -166,7 +166,7 @@ export const remove = api(
   }
 );
 
-export const publishArticle = new Topic<PublishArticleEvent>(
+export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
   "publish-article",
   {
     deliveryGuarantee: "at-least-once",

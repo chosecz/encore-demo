@@ -5,7 +5,7 @@ import log from "encore.dev/log";
 import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
 import { articles } from "~encore/clients";
-import { publishArticle } from "../articles/api";
+import { PublishedArticleTopic } from "../articles/api";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
@@ -46,7 +46,7 @@ export const sendEmail = api(
   }
 );
 
-const _ = new Subscription(publishArticle, "send-notification-email", {
+const _ = new Subscription(PublishedArticleTopic, "send-notification-email", {
   handler: async (event: PublishArticleEvent) => {
     log.info("Received event to send email for published article", {
       articleID: event.articleID,
