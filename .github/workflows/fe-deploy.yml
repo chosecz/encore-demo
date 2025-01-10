@@ -15,6 +15,7 @@ jobs:
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GCP_SERVICE_ID: ${{ vars.GCP_SERVICE_ID }}
       GCP_SERVICE_REGION: ${{ vars.GCP_SERVICE_REGION }}
+      PUBLIC_API_URL: ${{ vars.PUBLIC_API_URL }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4

@@ -13,7 +13,7 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-		"gen": "encore gen client encore-demo-2hy2 -o=./src/lib/client.ts"
+		"gen": "encore gen client encore-demo-2hy2 -o=./src/lib/encore-client.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",

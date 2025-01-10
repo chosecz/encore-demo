@@ -1,2 +1,4 @@
-<h1>Welcome to SvelteKit 2</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<h1>Welcome GRPN Demo Web App</h1>
+<ul>
+  <li><a href="/articles">Articles</a></li>
+</ul>

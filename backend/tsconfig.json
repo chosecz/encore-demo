@@ -9,7 +9,8 @@
     "paths": {
       "~encore/*": ["./encore.gen/*"],
       "@articles/*": ["./articles/*"],
-      "@email/*": ["./email/*"]
+      "@email/*": ["./email/*"],
+      "@users/*": ["./users/*"]
     },
 
     /* Workspace Settings */
