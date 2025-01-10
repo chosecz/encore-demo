@@ -12,7 +12,7 @@ const resendApiKey = secret("RESEND_API_KEY");
 
 // Send an email
 export const sendEmail = api(
-  { expose: true, method: "POST", path: "/email/send" },
+  { expose: false, method: "POST", path: "/email/send" },
   async ({
     email,
     subject,
