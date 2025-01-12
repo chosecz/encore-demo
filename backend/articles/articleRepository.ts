@@ -48,7 +48,7 @@ export class ArticleRepository {
     const result = await db.queryRow<Article>`
       INSERT INTO article (title, description, created_at)
       VALUES (${data.title}, ${data.description}, NOW())
-      RETURNING *
+      RETURNING id
     `;
     if (!result) {
       throw APIError.internal("Failed to create article");
