@@ -10,7 +10,7 @@
       "~encore/*": ["./encore.gen/*"],
       "@articles/*": ["./articles/*"],
       "@email/*": ["./email/*"],
-      "@users/*": ["./users/*"]
+      "@user/*": ["./user/*"]
     },
 
     /* Workspace Settings */

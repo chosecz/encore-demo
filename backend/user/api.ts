@@ -4,7 +4,7 @@ import {
   GetUserFromGoogleIdRequest,
   GetUserRequest,
   GetUserResponse,
-} from "@users/types";
+} from "@user/types";
 import { api } from "encore.dev/api";
 
 export const createUser = api(

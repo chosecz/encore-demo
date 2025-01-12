@@ -44,3 +44,7 @@ export interface ListArticlesRequest {
 export interface PublishArticleResponse {
   message: string;
 }
+
+export interface ListArticlesResponse {
+  articles: Article[];
+}
