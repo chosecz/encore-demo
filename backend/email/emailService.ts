@@ -11,6 +11,7 @@ import {
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
+const WEB_URL = secret("WEB_URL");
 
 // Send an email
 export const sendEmail = api(
@@ -61,12 +62,14 @@ const _ = new Subscription(PublishedArticleTopic, "send-notification-email", {
       });
     }
 
+    const webUrl = WEB_URL();
+
     // Send notification email
     const { id, success } = await sendEmail({
       email: ["josef.sima@gmail.com"],
       subject: `Article published (id: ${_article.id})`,
-      html: `<p>Article "${_article.title}" has been published</p>`,
-      text: `Article "${_article.title}" has been published`,
+      html: `<p>Article "${_article.title}" has been published</p><p><a href="${webUrl}/articles/${_article.id}">View article</a></p>`,
+      text: `Article "${_article.title}" has been published\n\n${webUrl}/articles/${_article.id}`,
     });
 
     if (!success) {
