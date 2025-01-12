@@ -116,6 +116,11 @@ export namespace article {
 }
 
 export namespace user {
+    export interface CreateSessionRequest {
+        userId: string
+        expiresAt: string
+    }
+
     export interface CreateUserRequest {
         googleId: string
         email: string
@@ -127,15 +132,20 @@ export namespace user {
         id: string
     }
 
-    export interface GetUserFromGoogleIdRequest {
-        googleId: string
-    }
-
-    export interface GetUserRequest {
-        id: string
-    }
-
     export interface GetUserResponse {
+        user?: User
+        found: boolean
+    }
+
+    export interface SessionResponse {
+        id: string
+        userId: string
+        expiresAt: string
+        createdAt: string
+        updatedAt: string
+    }
+
+    export interface User {
         id: string
         email: string
         name: string
@@ -149,31 +159,37 @@ export namespace user {
             this.baseClient = baseClient
         }
 
+        public async createSession(params: CreateSessionRequest): Promise<SessionResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("POST", `/users/sessions`, JSON.stringify(params))
+            return await resp.json() as SessionResponse
+        }
+
         public async createUser(params: CreateUserRequest): Promise<CreateUserResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("POST", `/users/create`, JSON.stringify(params))
             return await resp.json() as CreateUserResponse
         }
 
-        public async getUser(params: GetUserRequest): Promise<GetUserResponse> {
-            // Convert our params into the objects we need for the request
-            const query = makeRecord<string, string | string[]>({
-                id: params.id,
-            })
+        public async deleteSession(id: string): Promise<void> {
+            await this.baseClient.callAPI("DELETE", `/users/sessions/${encodeURIComponent(id)}`)
+        }
 
+        public async getSession(id: string): Promise<SessionResponse> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("GET", `/users/get`, undefined, {query})
+            const resp = await this.baseClient.callAPI("GET", `/users/sessions/${encodeURIComponent(id)}`)
+            return await resp.json() as SessionResponse
+        }
+
+        public async getUser(id: string): Promise<GetUserResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("GET", `/users/${encodeURIComponent(id)}`)
             return await resp.json() as GetUserResponse
         }
 
-        public async getUserFromGoogleId(params: GetUserFromGoogleIdRequest): Promise<GetUserResponse> {
-            // Convert our params into the objects we need for the request
-            const query = makeRecord<string, string | string[]>({
-                googleId: params.googleId,
-            })
-
+        public async getUserFromGoogleId(googleId: string): Promise<GetUserResponse> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("GET", `/users/get-from-google-id`, undefined, {query})
+            const resp = await this.baseClient.callAPI("GET", `/users/get-from-google-id/${encodeURIComponent(googleId)}`)
             return await resp.json() as GetUserResponse
         }
     }

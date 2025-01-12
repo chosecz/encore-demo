@@ -13,11 +13,16 @@ export interface GetUserRequest {
   id: string;
 }
 
-export interface GetUserResponse {
+export interface User {
   id: string;
   email: string;
   name: string;
   picture: string;
+}
+
+export interface GetUserResponse {
+  user?: User;
+  found: boolean;
 }
 
 export interface UpdateUserRequest {
@@ -29,4 +34,21 @@ export interface UpdateUserRequest {
 
 export interface GetUserFromGoogleIdRequest {
   googleId: string;
+}
+
+export interface CreateSessionRequest {
+  userId: string;
+  expiresAt: Date;
+}
+
+export interface SessionResponse {
+  id: string;
+  userId: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface GetSessionRequest {
+  id: string;
 }
