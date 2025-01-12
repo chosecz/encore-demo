@@ -39,4 +39,4 @@ You can preview the production build with `npm run preview`.
 
 ## Deploy
 
-Just push to the `staging` or `main` branch.
+Just push to the `staging` or `main` branch...
