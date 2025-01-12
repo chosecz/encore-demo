@@ -10,7 +10,7 @@ on:
 jobs:
   test-build-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod-eu' || 'staging-eu' }}
     defaults:
       run:
         working-directory: frontend/demo-web
