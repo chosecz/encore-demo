@@ -4,7 +4,7 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
   const client = new Client(PUBLIC_API_URL);
-  const data = await client.articles.articles({ status: "published" });
+  const data = await client.article.list({ status: "published" });
 
   return {
     articles: data.articles,

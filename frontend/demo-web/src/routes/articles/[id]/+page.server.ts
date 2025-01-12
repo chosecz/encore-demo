@@ -6,7 +6,7 @@ import type { PageServerLoad } from "./$types";
 export const load = (async ({ params }) => {
   try {
     const client = new Client(PUBLIC_API_URL);
-    const article = await client.articles.article(params.id);
+    const article = await client.article.get(params.id);
     return {
       article,
     };

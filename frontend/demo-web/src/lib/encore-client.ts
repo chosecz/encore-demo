@@ -30,8 +30,8 @@ export function PreviewEnv(pr: number | string): BaseURL {
  * Client is an API client for the encore-demo-2hy2 Encore application.
  */
 export default class Client {
-    public readonly articles: articles.ServiceClient
-    public readonly email: email.ServiceClient
+    public readonly article: article.ServiceClient
+    public readonly user: user.ServiceClient
 
 
     /**
@@ -42,8 +42,8 @@ export default class Client {
      */
     constructor(target: BaseURL, options?: ClientOptions) {
         const base = new BaseClient(target, options ?? {})
-        this.articles = new articles.ServiceClient(base)
-        this.email = new email.ServiceClient(base)
+        this.article = new article.ServiceClient(base)
+        this.user = new user.ServiceClient(base)
     }
 }
 
@@ -62,11 +62,124 @@ export interface ClientOptions {
     requestInit?: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
 }
 
-export namespace articles {
-    export interface AllArticlesResponse {
-        articles: Article[]
+export namespace article {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+        }
+
+        public async create(params: articles.CreateArticleRequest): Promise<articles.CreateArticleResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("POST", `/articles`, JSON.stringify(params))
+            return await resp.json() as articles.CreateArticleResponse
+        }
+
+        public async get(id: string): Promise<articles.Article> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("GET", `/articles/${encodeURIComponent(id)}`)
+            return await resp.json() as articles.Article
+        }
+
+        public async list(params: articles.ListArticlesRequest): Promise<articles.ListArticlesResponse> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                includeDeleted: params.includeDeleted === undefined ? undefined : String(params.includeDeleted),
+                status:         params.status === undefined ? undefined : String(params.status),
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("GET", `/articles`, undefined, {query})
+            return await resp.json() as articles.ListArticlesResponse
+        }
+
+        public async publish(id: string): Promise<articles.PublishArticleResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("POST", `/articles/${encodeURIComponent(id)}/publish`)
+            return await resp.json() as articles.PublishArticleResponse
+        }
+
+        public async remove(id: string): Promise<articles.DeleteArticleResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("DELETE", `/articles/${encodeURIComponent(id)}`)
+            return await resp.json() as articles.DeleteArticleResponse
+        }
+
+        public async update(id: string, params: articles.UpdateArticleRequest): Promise<articles.UpdateArticleResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("PUT", `/articles/${encodeURIComponent(id)}`, JSON.stringify(params))
+            return await resp.json() as articles.UpdateArticleResponse
+        }
+    }
+}
+
+export namespace user {
+    export interface CreateUserRequest {
+        googleId: string
+        email: string
+        name: string
+        picture: string
     }
 
+    export interface CreateUserResponse {
+        id: string
+    }
+
+    export interface GetUserFromGoogleIdRequest {
+        googleId: string
+    }
+
+    export interface GetUserRequest {
+        id: string
+    }
+
+    export interface GetUserResponse {
+        id: string
+        email: string
+        name: string
+        picture: string
+    }
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+        }
+
+        public async createUser(params: CreateUserRequest): Promise<CreateUserResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("POST", `/users/create`, JSON.stringify(params))
+            return await resp.json() as CreateUserResponse
+        }
+
+        public async getUser(params: GetUserRequest): Promise<GetUserResponse> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                id: params.id,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("GET", `/users/get`, undefined, {query})
+            return await resp.json() as GetUserResponse
+        }
+
+        public async getUserFromGoogleId(params: GetUserFromGoogleIdRequest): Promise<GetUserResponse> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                googleId: params.googleId,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callAPI("GET", `/users/get-from-google-id`, undefined, {query})
+            return await resp.json() as GetUserResponse
+        }
+    }
+}
+
+export namespace articles {
     export interface Article {
         id: string
         title: string
@@ -96,6 +209,10 @@ export namespace articles {
         status?: "draft" | "published" | "archived"
     }
 
+    export interface ListArticlesResponse {
+        articles: Article[]
+    }
+
     export interface PublishArticleResponse {
         message: string
     }
@@ -107,102 +224,6 @@ export namespace articles {
 
     export interface UpdateArticleResponse {
         message: string
-    }
-
-    export class ServiceClient {
-        private baseClient: BaseClient
-
-        constructor(baseClient: BaseClient) {
-            this.baseClient = baseClient
-        }
-
-        /**
-         * Return a single article or 404 if not found
-         */
-        public async article(id: string): Promise<Article> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("GET", `/articles/${encodeURIComponent(id)}`)
-            return await resp.json() as Article
-        }
-
-        /**
-         * Return all articles
-         */
-        public async articles(params: ListArticlesRequest): Promise<AllArticlesResponse> {
-            // Convert our params into the objects we need for the request
-            const query = makeRecord<string, string | string[]>({
-                includeDeleted: params.includeDeleted === undefined ? undefined : String(params.includeDeleted),
-                status:         params.status === undefined ? undefined : String(params.status),
-            })
-
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("GET", `/articles`, undefined, {query})
-            return await resp.json() as AllArticlesResponse
-        }
-
-        /**
-         * Create a new article
-         */
-        public async create(params: CreateArticleRequest): Promise<CreateArticleResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("POST", `/articles`, JSON.stringify(params))
-            return await resp.json() as CreateArticleResponse
-        }
-
-        public async publish(id: string): Promise<PublishArticleResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("POST", `/articles/${encodeURIComponent(id)}/publish`)
-            return await resp.json() as PublishArticleResponse
-        }
-
-        /**
-         * Delete an existing article
-         */
-        public async remove(id: string): Promise<DeleteArticleResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("DELETE", `/articles/${encodeURIComponent(id)}`)
-            return await resp.json() as DeleteArticleResponse
-        }
-
-        /**
-         * Update an existing article
-         */
-        public async update(id: string, params: UpdateArticleRequest): Promise<UpdateArticleResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("PUT", `/articles/${encodeURIComponent(id)}`, JSON.stringify(params))
-            return await resp.json() as UpdateArticleResponse
-        }
-    }
-}
-
-export namespace email {
-    export interface SendEmailRequest {
-        email: string[]
-        subject: string
-        html: string
-        text: string
-    }
-
-    export interface SendEmailResponse {
-        id?: string
-        success: boolean
-    }
-
-    export class ServiceClient {
-        private baseClient: BaseClient
-
-        constructor(baseClient: BaseClient) {
-            this.baseClient = baseClient
-        }
-
-        /**
-         * Send an email
-         */
-        public async sendEmail(params: SendEmailRequest): Promise<SendEmailResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("POST", `/email/send`, JSON.stringify(params))
-            return await resp.json() as SendEmailResponse
-        }
     }
 }
 
