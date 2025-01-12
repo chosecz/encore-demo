@@ -1,11 +1,13 @@
-import { PublishArticleEvent } from "@articles/types";
 import { api, APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
 import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
-import { articles } from "~encore/clients";
-import { PublishedArticleTopic } from "../articles/api";
+import { article } from "~encore/clients";
+import {
+  PublishedArticleTopic,
+  type PublishArticleEvent,
+} from "../articles/publish";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
@@ -49,13 +51,13 @@ export const sendEmail = api(
 const _ = new Subscription(PublishedArticleTopic, "send-notification-email", {
   handler: async (event: PublishArticleEvent) => {
     log.info("Received event to send email for published article", {
-      articleID: event.articleID,
+      articleID: event.articleId,
     });
-    const _article = await articles.article({ id: event.articleID });
+    const _article = await article.get({ id: event.articleId });
     if (!_article) {
-      log.error("Article not found", { articleID: event.articleID });
+      log.error("Article not found", { articleID: event.articleId });
       throw APIError.notFound("Article not found").withDetails({
-        articleID: event.articleID,
+        articleID: event.articleId,
       });
     }
 

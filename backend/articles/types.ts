@@ -36,14 +36,6 @@ export interface DeleteArticleResponse {
   message: string;
 }
 
-export interface PublishArticleResponse {
-  message: string;
-}
-
-export interface PublishArticleEvent {
-  articleID: string;
-}
-
 export interface ListArticlesRequest {
   includeDeleted?: boolean;
   status?: "draft" | "published" | "archived";
