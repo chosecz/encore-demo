@@ -40,3 +40,7 @@ export interface ListArticlesRequest {
   includeDeleted?: boolean;
   status?: "draft" | "published" | "archived";
 }
+
+export interface PublishArticleResponse {
+  message: string;
+}

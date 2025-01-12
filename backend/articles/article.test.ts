@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { get, remove, update } from "./api";
-import { create, list } from "./articleHandler";
+import { create, get, list, remove, update } from "./articleHandler";
 
 // Store the article ID for use across tests
 let testArticleId: string;

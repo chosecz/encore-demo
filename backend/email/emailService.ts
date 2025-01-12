@@ -7,7 +7,7 @@ import { article } from "~encore/clients";
 import {
   PublishedArticleTopic,
   type PublishArticleEvent,
-} from "../articles/publish";
+} from "../articles/articleService";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");
@@ -51,7 +51,7 @@ export const sendEmail = api(
 const _ = new Subscription(PublishedArticleTopic, "send-notification-email", {
   handler: async (event: PublishArticleEvent) => {
     log.info("Received event to send email for published article", {
-      articleID: event.articleId,
+      articleId: event.articleId,
     });
     const _article = await article.get({ id: event.articleId });
     if (!_article) {

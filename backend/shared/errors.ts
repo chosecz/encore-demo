@@ -11,6 +11,9 @@ export const errorHandler = (
     stack: error instanceof Error ? error.stack : undefined,
     ...details,
   });
+  if (error instanceof APIError) {
+    throw error;
+  }
   throw APIError.internal(message).withDetails({
     message: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
