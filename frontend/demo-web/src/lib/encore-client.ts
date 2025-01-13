@@ -71,6 +71,7 @@ export interface ClientOptions {
 
 export namespace article {
     export interface ArticleResponse {
+        author: user.GetUserResponse
         id: string
         title: string
         description: string
@@ -79,7 +80,6 @@ export namespace article {
         "created_at": string
         "updated_at": string
         "deleted_at": string | null
-        author: user.GetUserResponse
     }
 
     export interface CreateArticleRequest {

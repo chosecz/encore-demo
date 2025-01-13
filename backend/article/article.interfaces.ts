@@ -13,7 +13,7 @@ export interface CreateArticleResponse {
   message: string;
 }
 
-export interface ArticleResponse {
+export interface Article {
   id: string;
   title: string;
   description: string;
@@ -22,6 +22,9 @@ export interface ArticleResponse {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+
+export interface ArticleResponse extends Article {
   author: GetUserResponse;
 }
 

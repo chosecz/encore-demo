@@ -22,10 +22,12 @@
         <a href="/articles/{article.id}">{article.title}</a>
       </h2>
       <p>{article.description}</p>
-      {#if data.user}
+      {#if data.user?.id === article.author_id}
         <p class="status">Status: {article.status}</p>
       {/if}
     </div>
+  {:else}
+    <p>No articles, create your first one!</p>
   {/each}
 
   {#if data.user}

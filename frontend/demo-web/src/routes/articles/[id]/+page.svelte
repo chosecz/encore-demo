@@ -18,6 +18,7 @@
     <span class="status">Status: {article.status}</span>
     <span class="date">Created: {new Date(article.created_at).toLocaleDateString()}</span>
     <span class="date">Updated: {new Date(article.updated_at).toLocaleDateString()}</span>
+    <span class="author">Author: {article.author.name}</span>
   </div>
 
   <div class="description">

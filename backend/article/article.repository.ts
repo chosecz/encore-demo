@@ -1,5 +1,6 @@
 import { db } from "@article/article.db";
 import {
+  Article,
   ArticleResponse,
   CreateArticleRequest,
   ListArticlesRequest,
@@ -48,7 +49,7 @@ export class ArticleRepository {
     return articles;
   }
 
-  async create(data: CreateArticleRequest): Promise<ArticleResponse> {
+  async create(data: CreateArticleRequest): Promise<Article> {
     // check if user exists
     const userExists = await user.getUser({ id: data.author_id });
     if (!userExists) {
@@ -58,7 +59,7 @@ export class ArticleRepository {
     }
 
     // create article
-    const result = await db.queryRow<ArticleResponse>`
+    const result = await db.queryRow<Article>`
       INSERT INTO article (title, description, author_id, created_at)
       VALUES (${data.title}, ${data.description}, ${data.author_id}, NOW())
       RETURNING *
@@ -132,17 +133,16 @@ export class ArticleRepository {
   private async buildArticleListQuery(
     userID: string | null,
     includeDeleted?: boolean,
-    status?: ArticleResponse["status"],
+    status?: Article["status"],
     offset: number = 0,
     limit: number = 10
-  ): Promise<AsyncGenerator<ArticleResponse>> {
+  ): Promise<AsyncGenerator<Article>> {
     // if userID is provided, build query for user's articles
     if (userID) {
       if (includeDeleted && status) {
-        return db.query<ArticleResponse>`
+        return db.query<Article>`
           SELECT * FROM article
-          WHERE author_id = ${userID}
-          AND status = ${status}
+          WHERE (author_id = ${userID} AND status = ${status})
           ORDER BY created_at DESC
           OFFSET ${offset}
           LIMIT ${limit}
@@ -150,7 +150,7 @@ export class ArticleRepository {
       }
 
       if (includeDeleted) {
-        return db.query<ArticleResponse>`
+        return db.query<Article>`
         SELECT * FROM article
         WHERE author_id = ${userID}
         ORDER BY created_at DESC
@@ -160,20 +160,20 @@ export class ArticleRepository {
       }
 
       if (status) {
-        return db.query<ArticleResponse>`
+        return db.query<Article>`
           SELECT * FROM article
-          WHERE author_id = ${userID}
-          AND status = ${status}
+          WHERE (author_id = ${userID} AND status = ${status})
+          AND deleted_at IS NULL
           ORDER BY created_at DESC
           OFFSET ${offset}
           LIMIT ${limit}
         `;
       }
 
-      return db.query<ArticleResponse>`
+      return db.query<Article>`
         SELECT * FROM article
-        WHERE author_id = ${userID}
-        AND deleted_at IS NULL
+        WHERE (author_id = ${userID} AND deleted_at IS NULL)
+        OR (status = 'published')
         ORDER BY created_at DESC
         OFFSET ${offset}
         LIMIT ${limit}
@@ -181,7 +181,7 @@ export class ArticleRepository {
     }
 
     if (status) {
-      return db.query<ArticleResponse>`
+      return db.query<Article>`
         SELECT * FROM article
         WHERE status = ${status}
         AND deleted_at IS NULL
@@ -192,7 +192,7 @@ export class ArticleRepository {
     }
 
     // Default case: show only published, non-deleted articles
-    return db.query<ArticleResponse>`
+    return db.query<Article>`
         SELECT * FROM article
         WHERE status = 'published'
         AND deleted_at IS NULL

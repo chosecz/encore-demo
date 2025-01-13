@@ -1,4 +1,5 @@
 import {
+  Article,
   ArticleResponse,
   CreateArticleRequest,
   DeleteArticleResponse,
@@ -29,7 +30,7 @@ class ArticleService {
     return { articles: await articleRepository.list(params) };
   }
 
-  async create(data: CreateArticleRequest): Promise<ArticleResponse> {
+  async create(data: CreateArticleRequest): Promise<Article> {
     return await articleRepository.create(data);
   }
 
