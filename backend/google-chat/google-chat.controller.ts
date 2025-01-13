@@ -68,7 +68,9 @@ const _ = new Subscription(PublishedArticleTopic, "send-chat-message", {
 });
 
 async function webhook(text: string) {
-  const url = `https://chat.googleapis.com/v1/spaces/AAAAi9NJE3U/messages?key=${GOOGLE_CHAT_KEY}&token=${GOOGLE_CHAT_TOKEN}`;
+  const key = GOOGLE_CHAT_KEY();
+  const token = GOOGLE_CHAT_TOKEN();
+  const url = `https://chat.googleapis.com/v1/spaces/AAAAi9NJE3U/messages?key=${key}&token=${token}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=UTF-8" },

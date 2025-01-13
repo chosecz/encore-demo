@@ -19,6 +19,14 @@ export const actions = {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
 
+    if (!title || !description) {
+      return fail(400, {
+        title,
+        description,
+        error: "Title and description are required",
+      });
+    }
+
     let article = null;
     try {
       article = await client.article.create({
