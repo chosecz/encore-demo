@@ -70,6 +70,56 @@ export interface ClientOptions {
 }
 
 export namespace article {
+    export interface Article {
+        id: string
+        title: string
+        description: string
+        status: "draft" | "published" | "archived"
+        "author_id": string
+        "created_at": string
+        "updated_at": string
+        "deleted_at": string | null
+        author: user.GetUserResponse
+    }
+
+    export interface CreateArticleRequest {
+        title: string
+        description: string
+        "author_id": string
+    }
+
+    export interface CreateArticleResponse {
+        id: string
+        message: string
+    }
+
+    export interface DeleteArticleResponse {
+        message: string
+    }
+
+    export interface ListArticlesRequest {
+        includeDeleted?: boolean
+        status?: "draft" | "published" | "archived"
+        limit?: number
+        offset?: number
+    }
+
+    export interface ListArticlesResponse {
+        articles: Article[]
+    }
+
+    export interface PublishArticleResponse {
+        message: string
+    }
+
+    export interface UpdateArticleRequest {
+        title: string
+        description: string
+    }
+
+    export interface UpdateArticleResponse {
+        message: string
+    }
 
     export class ServiceClient {
         private baseClient: BaseClient
@@ -78,46 +128,48 @@ export namespace article {
             this.baseClient = baseClient
         }
 
-        public async create(params: articles.CreateArticleRequest): Promise<articles.CreateArticleResponse> {
+        public async create(params: CreateArticleRequest): Promise<CreateArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("POST", `/articles`, JSON.stringify(params))
-            return await resp.json() as articles.CreateArticleResponse
+            return await resp.json() as CreateArticleResponse
         }
 
-        public async get(id: string): Promise<articles.Article> {
+        public async get(id: string): Promise<Article> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/articles/${encodeURIComponent(id)}`)
-            return await resp.json() as articles.Article
+            return await resp.json() as Article
         }
 
-        public async list(params: articles.ListArticlesRequest): Promise<articles.ListArticlesResponse> {
+        public async list(params: ListArticlesRequest): Promise<ListArticlesResponse> {
             // Convert our params into the objects we need for the request
             const query = makeRecord<string, string | string[]>({
                 includeDeleted: params.includeDeleted === undefined ? undefined : String(params.includeDeleted),
+                limit:          params.limit === undefined ? undefined : String(params.limit),
+                offset:         params.offset === undefined ? undefined : String(params.offset),
                 status:         params.status === undefined ? undefined : String(params.status),
             })
 
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/articles`, undefined, {query})
-            return await resp.json() as articles.ListArticlesResponse
+            return await resp.json() as ListArticlesResponse
         }
 
-        public async publish(id: string): Promise<articles.PublishArticleResponse> {
+        public async publish(id: string): Promise<PublishArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("POST", `/articles/${encodeURIComponent(id)}/publish`)
-            return await resp.json() as articles.PublishArticleResponse
+            return await resp.json() as PublishArticleResponse
         }
 
-        public async remove(id: string): Promise<articles.DeleteArticleResponse> {
+        public async remove(id: string): Promise<DeleteArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("DELETE", `/articles/${encodeURIComponent(id)}`)
-            return await resp.json() as articles.DeleteArticleResponse
+            return await resp.json() as DeleteArticleResponse
         }
 
-        public async update(id: string, params: articles.UpdateArticleRequest): Promise<articles.UpdateArticleResponse> {
+        public async update(id: string, params: UpdateArticleRequest): Promise<UpdateArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("PUT", `/articles/${encodeURIComponent(id)}`, JSON.stringify(params))
-            return await resp.json() as articles.UpdateArticleResponse
+            return await resp.json() as UpdateArticleResponse
         }
     }
 }
@@ -208,54 +260,6 @@ export namespace user {
         public async updateSessionExpiration(id: string, params: UpdateSessionExpirationRequest): Promise<void> {
             await this.baseClient.callAPI("POST", `/users/sessions/${encodeURIComponent(id)}/update-expiration`, JSON.stringify(params))
         }
-    }
-}
-
-export namespace articles {
-    export interface Article {
-        id: string
-        title: string
-        description: string
-        status: "draft" | "published" | "archived"
-        "created_at": string
-        "updated_at": string
-        "deleted_at": string | null
-    }
-
-    export interface CreateArticleRequest {
-        title: string
-        description: string
-    }
-
-    export interface CreateArticleResponse {
-        id: string
-        message: string
-    }
-
-    export interface DeleteArticleResponse {
-        message: string
-    }
-
-    export interface ListArticlesRequest {
-        includeDeleted?: boolean
-        status?: "draft" | "published" | "archived"
-    }
-
-    export interface ListArticlesResponse {
-        articles: Article[]
-    }
-
-    export interface PublishArticleResponse {
-        message: string
-    }
-
-    export interface UpdateArticleRequest {
-        title: string
-        description: string
-    }
-
-    export interface UpdateArticleResponse {
-        message: string
     }
 }
 

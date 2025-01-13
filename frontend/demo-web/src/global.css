@@ -1,3 +1,14 @@
 body {
   font-family: "EB Garamond", Georgia, serif;
 }
+
+a {
+  color: #0066cc;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #004499;
+  text-decoration: underline;
+}

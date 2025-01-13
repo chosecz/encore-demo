@@ -8,6 +8,7 @@ import {
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "@article/types";
+import { userRepository } from "@user/userRepository";
 import log from "encore.dev/log";
 import { Topic } from "encore.dev/pubsub";
 
@@ -20,15 +21,25 @@ export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
 
 class ArticleService {
   async get(id: string): Promise<Article> {
-    return await articleRepository.findById(id);
+    const article = await articleRepository.findById(id);
+    const author = await userRepository.findById(article.author_id);
+    return { ...article, author };
   }
 
   async list(
     includeDeleted?: boolean,
     status?: Article["status"],
-    userId?: string
+    userId?: string,
+    offset?: number,
+    limit?: number
   ): Promise<Article[]> {
-    return await articleRepository.list(includeDeleted, status, userId);
+    return await articleRepository.list(
+      includeDeleted,
+      status,
+      userId,
+      offset,
+      limit
+    );
   }
 
   async create(data: CreateArticleRequest): Promise<Article> {

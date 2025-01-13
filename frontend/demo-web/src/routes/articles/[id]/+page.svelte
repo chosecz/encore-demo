@@ -1,6 +1,9 @@
 <script lang="ts">
-  const { data } = $props();
-  const article = data.article;
+  import { enhance } from "$app/forms";
+
+  let { data, form } = $props();
+  let article = $derived(data.article);
+  let user = $derived(data.user);
 </script>
 
 <svelte:head>
@@ -19,6 +22,17 @@
   <div class="description">
     <p>{article.description}</p>
   </div>
+
+  {#if form?.error}
+    <p class="error">{form.error}</p>
+  {/if}
+
+  {#if article.status === "draft" && article.author_id === user?.id}
+    <form method="post" action="?/publish" use:enhance>
+      <input type="hidden" name="articleId" value={article.id} />
+      <button type="submit">Publish</button>
+    </form>
+  {/if}
 
   <a href="/articles" class="back-link">← Back to Articles</a>
 </div>

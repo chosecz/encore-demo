@@ -24,7 +24,9 @@ export const list = api(
         articles: await articleService.list(
           params.includeDeleted,
           params.status,
-          userID
+          userID,
+          params.offset,
+          params.limit
         ),
       };
     } catch (error) {
