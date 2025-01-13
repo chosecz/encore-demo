@@ -1,3 +1,5 @@
+import { PUBLIC_API_URL } from "$env/static/public";
+import Client, { type user } from "$lib/encore-client";
 import type { RequestEvent } from "@sveltejs/kit";
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date): void {
@@ -17,4 +19,33 @@ export function deleteSessionTokenCookie(event: RequestEvent): void {
     maxAge: 0,
     path: "/",
   });
+}
+
+export async function invalidateSession(sessionId: string): Promise<void> {
+  const client = new Client(PUBLIC_API_URL);
+  await client.user.deleteSession(sessionId);
+}
+
+export async function validateSessionToken(
+  sessionToken: string
+): Promise<user.SessionResponse | null> {
+  if (!sessionToken) {
+    return null;
+  }
+  const client = new Client(PUBLIC_API_URL);
+
+  try {
+    const session = await client.user.getSession(sessionToken);
+    if (new Date(session.expiresAt) <= new Date()) {
+      return null;
+    }
+    return session;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function getSession(sessionId: string): Promise<user.SessionResponse | null> {
+  const client = new Client(PUBLIC_API_URL);
+  return await client.user.getSession(sessionId);
 }

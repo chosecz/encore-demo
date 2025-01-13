@@ -1,5 +1,5 @@
 import { PUBLIC_API_URL } from "$env/static/public";
-import Client from "$lib/encore-client";
+import Client, { APIError } from "$lib/encore-client";
 import { google } from "$lib/server/oauth";
 import { setSessionTokenCookie } from "$lib/server/session";
 import { ObjectParser } from "@pilcrowjs/object-parser";
@@ -39,10 +39,21 @@ export async function GET(event: RequestEvent): Promise<Response> {
   const picture = claimsParser.getString("picture");
   const email = claimsParser.getString("email");
 
-  const existingUser = await client.user.getUserFromGoogleId(googleId);
-  if (existingUser.user) {
+  let existingUser = undefined;
+  try {
+    existingUser = await client.user.getUserFromGoogleId(googleId);
+  } catch (error) {
+    // do nothing, when returns 404 it is ok
+    if (error instanceof APIError && error.status === 404) {
+      existingUser = undefined;
+    } else {
+      throw error;
+    }
+  }
+
+  if (existingUser) {
     const session = await client.user.createSession({
-      userId: existingUser.user.id,
+      userId: existingUser.id,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
     });
     setSessionTokenCookie(event, session.id, new Date(session.expiresAt));

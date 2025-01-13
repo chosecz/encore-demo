@@ -133,8 +133,10 @@ export namespace user {
     }
 
     export interface GetUserResponse {
-        user?: User
-        found: boolean
+        id: string
+        email: string
+        name: string
+        picture: string
     }
 
     export interface SessionResponse {
@@ -143,13 +145,6 @@ export namespace user {
         expiresAt: string
         createdAt: string
         updatedAt: string
-    }
-
-    export interface User {
-        id: string
-        email: string
-        name: string
-        picture: string
     }
 
     export class ServiceClient {

@@ -13,16 +13,11 @@ export interface GetUserRequest {
   id: string;
 }
 
-export interface User {
+export interface GetUserResponse {
   id: string;
   email: string;
   name: string;
   picture: string;
-}
-
-export interface GetUserResponse {
-  user?: User;
-  found: boolean;
 }
 
 export interface UpdateUserRequest {

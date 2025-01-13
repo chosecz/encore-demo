@@ -5,42 +5,31 @@ import {
   CreateUserRequest,
   GetUserResponse,
   SessionResponse,
-  User,
 } from "./types";
 
 export class UserRepository {
   async findById(id: string): Promise<GetUserResponse> {
-    const user = await db.queryRow<User>`
+    const user = await db.queryRow<GetUserResponse>`
       SELECT id, email, name, picture
       FROM users
       WHERE id = ${id} AND deleted_at IS NULL
     `;
     if (!user) {
-      return {
-        found: false,
-      };
+      throw APIError.notFound("User not found");
     }
-    return {
-      user,
-      found: true,
-    };
+    return user;
   }
 
   async findByGoogleId(googleId: string): Promise<GetUserResponse> {
-    const user = await db.queryRow<User>`
+    const user = await db.queryRow<GetUserResponse>`
       SELECT id, email, name, picture
       FROM users
       WHERE google_id = ${googleId} AND deleted_at IS NULL
     `;
     if (!user) {
-      return {
-        found: false,
-      };
+      throw APIError.notFound("User not found");
     }
-    return {
-      user,
-      found: true,
-    };
+    return user;
   }
 
   async create(data: CreateUserRequest): Promise<{ id: string }> {
