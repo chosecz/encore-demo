@@ -70,6 +70,15 @@ export class ArticleRepository {
   }
 
   async update(params: UpdateArticleRequest): Promise<void> {
+    const { userID = null } = getAuthData() || {};
+
+    const article = await this.findById(params.id);
+    if (article.author_id !== userID) {
+      throw APIError.permissionDenied(
+        "Only the author can update this article"
+      );
+    }
+
     await db.exec`
       UPDATE article
       SET title = ${params.title},
@@ -80,6 +89,15 @@ export class ArticleRepository {
   }
 
   async delete(id: string): Promise<void> {
+    const { userID = null } = getAuthData() || {};
+
+    const article = await this.findById(id);
+    if (article.author_id !== userID) {
+      throw APIError.permissionDenied(
+        "Only the author can delete this article"
+      );
+    }
+
     await db.exec`
       UPDATE article
       SET deleted_at = NOW()
