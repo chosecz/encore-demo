@@ -1,6 +1,7 @@
+import { articleService } from "@article/articleService";
+import { errorHandler } from "@shared/errors";
 import { api } from "encore.dev/api";
-import { errorHandler } from "../shared/errors";
-import { articleService } from "./articleService";
+import { getAuthData } from "~encore/auth";
 import {
   Article,
   CreateArticleRequest,
@@ -16,11 +17,14 @@ import {
 export const list = api(
   { expose: true, method: "GET", path: "/articles" },
   async (params: ListArticlesRequest): Promise<ListArticlesResponse> => {
+    const authData = getAuthData();
+    const { userID } = authData || {};
     try {
       return {
         articles: await articleService.list(
           params.includeDeleted,
-          params.status
+          params.status,
+          userID
         ),
       };
     } catch (error) {
@@ -47,7 +51,9 @@ export const get = api(
     try {
       return await articleService.get(id);
     } catch (error) {
-      return errorHandler(error, "Failed to get article");
+      return errorHandler(error, "Failed to get article", {
+        articleId: id,
+      });
     }
   }
 );
@@ -59,7 +65,9 @@ export const update = api(
       await articleService.update(params);
       return { message: "Article updated" };
     } catch (error) {
-      return errorHandler(error, "Failed to update article");
+      return errorHandler(error, "Failed to update article", {
+        articleId: params.id,
+      });
     }
   }
 );
@@ -71,16 +79,20 @@ export const remove = api(
       await articleService.delete(id);
       return { message: "Article deleted" };
     } catch (error) {
-      return errorHandler(error, "Failed to delete article");
+      return errorHandler(error, "Failed to delete article", {
+        articleId: id,
+      });
     }
   }
 );
 
 export const publish = api(
-  { expose: true, method: "POST", path: "/articles/:id/publish" },
+  { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
   async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
     try {
-      await articleService.publish(id);
+      const authData = getAuthData()!;
+      const { userID } = authData;
+      await articleService.publish(id, userID);
       return { message: "Article published" };
     } catch (error) {
       return errorHandler(error, "Failed to publish article", {

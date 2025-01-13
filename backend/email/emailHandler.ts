@@ -1,12 +1,13 @@
+import { SendEmailRequest, SendEmailResponse } from "@email/types";
+import { errorHandler } from "@shared/errors";
 import { api, APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
 import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
 import { article } from "~encore/clients";
-import { PublishedArticleTopic } from "../articles/articleService";
-import { PublishArticleEvent } from "../articles/types";
-import { SendEmailRequest, SendEmailResponse } from "./types";
+import { PublishedArticleTopic } from "../article/articleService";
+import { PublishArticleEvent } from "../article/types";
 
 const resendApiKey = secret("RESEND_API_KEY");
 const WEB_URL = secret("WEB_URL");
@@ -33,10 +34,7 @@ export const sendEmail = api(
     });
 
     if (error) {
-      log.error("Error sending email", { error });
-      throw APIError.internal("Failed to send email").withDetails({
-        message: error.message,
-      });
+      return errorHandler(error, "Failed to send email");
     }
 
     log.info("Email successfully sent", { id: data?.id });

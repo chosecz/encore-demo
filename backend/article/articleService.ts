@@ -1,6 +1,4 @@
-import log from "encore.dev/log";
-import { Topic } from "encore.dev/pubsub";
-import { articleRepository } from "./articleRepository";
+import { articleRepository } from "@article/articleRepository";
 import {
   Article,
   CreateArticleRequest,
@@ -9,7 +7,9 @@ import {
   PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
-} from "./types";
+} from "@article/types";
+import log from "encore.dev/log";
+import { Topic } from "encore.dev/pubsub";
 
 export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
   "published-article",
@@ -23,8 +23,12 @@ class ArticleService {
     return await articleRepository.findById(id);
   }
 
-  async list(includeDeleted?: boolean, status?: string): Promise<Article[]> {
-    return await articleRepository.list(includeDeleted, status);
+  async list(
+    includeDeleted?: boolean,
+    status?: Article["status"],
+    userID?: string
+  ): Promise<Article[]> {
+    return await articleRepository.list(includeDeleted, status, userID);
   }
 
   async create(data: CreateArticleRequest): Promise<Article> {
@@ -41,12 +45,9 @@ class ArticleService {
     return { message: "Article deleted" };
   }
 
-  async publish(id: string): Promise<PublishArticleResponse> {
-    // First verify the article exists
-    await this.get(id);
-
-    // Update the article status
-    await articleRepository.publish(id);
+  async publish(id: string, userId: string): Promise<PublishArticleResponse> {
+    // Update the article status with author verification
+    await articleRepository.publish(id, userId);
 
     // Publish to pubsub
     log.info("Publishing article to pubsub", { articleId: id });

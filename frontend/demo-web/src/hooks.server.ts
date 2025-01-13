@@ -1,5 +1,3 @@
-import { PUBLIC_API_URL } from "$env/static/public";
-import Client from "$lib/encore-client";
 import {
   deleteSessionTokenCookie,
   setSessionTokenCookie,
@@ -25,20 +23,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
   }
 
   const { session, user } = sessionResponse;
-
-  // Extend session expiration by 30 days from now
-  const newExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-
-  try {
-    const client = new Client(PUBLIC_API_URL);
-    await client.user.updateSessionExpiration(token, {
-      expiresAt: newExpiresAt.toISOString(),
-    });
-    setSessionTokenCookie(event, token, newExpiresAt);
-  } catch (error) {
-    // If we fail to extend the session, continue with the current expiration
-    setSessionTokenCookie(event, token, new Date(session.expiresAt));
-  }
+  setSessionTokenCookie(event, token, new Date(session.expiresAt));
 
   event.locals.session = session;
   event.locals.user = user;

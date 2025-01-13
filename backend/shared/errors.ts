@@ -6,10 +6,14 @@ export function errorHandler(
   message: string,
   metadata?: object
 ): never {
+  log.error(message, {
+    error: error instanceof Error ? error.message : String(error),
+    stack: error instanceof Error ? error.stack : undefined,
+    ...metadata,
+  });
   if (error instanceof APIError) {
     throw error;
   }
 
-  log.error(message, { error, ...metadata });
   throw APIError.internal(message);
 }

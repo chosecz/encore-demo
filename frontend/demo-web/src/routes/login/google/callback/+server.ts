@@ -1,7 +1,7 @@
 import { PUBLIC_API_URL } from "$env/static/public";
 import Client, { APIError } from "$lib/encore-client";
 import { google } from "$lib/server/oauth";
-import { setSessionTokenCookie } from "$lib/server/session";
+import { createSession, setSessionTokenCookie } from "$lib/server/session";
 import { ObjectParser } from "@pilcrowjs/object-parser";
 import type { RequestEvent } from "@sveltejs/kit";
 import type { OAuth2Tokens } from "arctic";
@@ -52,10 +52,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
   }
 
   if (existingUser) {
-    const session = await client.user.createSession({
-      userId: existingUser.id,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
-    });
+    const session = await createSession(existingUser.id);
     setSessionTokenCookie(event, session.id, new Date(session.expiresAt));
     return new Response(null, {
       status: 302,
@@ -72,10 +69,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
     picture,
   });
 
-  const session = await client.user.createSession({
-    userId: user.id,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
-  });
+  const session = await createSession(user.id);
   setSessionTokenCookie(event, session.id, new Date(session.expiresAt));
   return new Response(null, {
     status: 302,

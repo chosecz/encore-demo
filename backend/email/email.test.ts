@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { describe, expect, test, vi } from "vitest";
-import { sendEmail } from "./emailService";
+import { sendEmail } from "./emailHandler";
 
 // Mock the secret function
 vi.mock("encore.dev/config", () => ({

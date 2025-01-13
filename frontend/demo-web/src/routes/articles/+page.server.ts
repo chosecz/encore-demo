@@ -1,8 +1,7 @@
-import { PUBLIC_API_URL } from "$env/static/public";
-import Client from "$lib/encore-client";
+import { Client } from "$lib/server/client";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-  const client = new Client(PUBLIC_API_URL);
-  return await client.article.list({ status: "published" });
+export const load: PageServerLoad = async ({ locals }) => {
+  const client = Client(locals.session?.id ?? "");
+  return await client.article.list(locals.user ? {} : { status: "published" });
 };

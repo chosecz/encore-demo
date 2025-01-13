@@ -5,12 +5,13 @@
     "lib": ["ES2022"],
     "target": "ES2022",
     "module": "ES2022",
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
     "paths": {
       "~encore/*": ["./encore.gen/*"],
-      "@articles/*": ["./articles/*"],
+      "@article/*": ["./article/*"],
       "@email/*": ["./email/*"],
-      "@user/*": ["./user/*"]
+      "@user/*": ["./user/*"],
+      "@shared/*": ["./shared/*"]
     },
 
     /* Workspace Settings */

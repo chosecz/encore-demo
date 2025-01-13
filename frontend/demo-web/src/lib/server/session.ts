@@ -1,6 +1,8 @@
-import { PUBLIC_API_URL } from "$env/static/public";
-import Client, { type user } from "$lib/encore-client";
+import { type user } from "$lib/encore-client";
+import { Client } from "$lib/server/client";
 import type { RequestEvent } from "@sveltejs/kit";
+
+const client = Client();
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date): void {
   event.cookies.set("session", token, {
@@ -21,8 +23,17 @@ export function deleteSessionTokenCookie(event: RequestEvent): void {
   });
 }
 
+export async function createSession(
+  userId: string,
+  expiresAt: Date = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
+): Promise<user.SessionResponse> {
+  return await client.user.createSession({
+    userId,
+    expiresAt: expiresAt.toISOString(),
+  });
+}
+
 export async function invalidateSession(sessionId: string): Promise<void> {
-  const client = new Client(PUBLIC_API_URL);
   await client.user.deleteSession(sessionId);
 }
 
@@ -32,13 +43,18 @@ export async function validateSessionToken(
   if (!sessionToken) {
     return null;
   }
-  const client = new Client(PUBLIC_API_URL);
 
   try {
     const session = await client.user.getSession(sessionToken);
     if (new Date(session.expiresAt) <= new Date()) {
       return null;
     }
+    session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString();
+
+    await client.user.updateSessionExpiration(sessionToken, {
+      expiresAt: session.expiresAt,
+    });
+
     const user = await client.user.getUser(session.userId);
     return { session, user };
   } catch (error) {
@@ -47,6 +63,5 @@ export async function validateSessionToken(
 }
 
 export async function getSession(sessionId: string): Promise<user.SessionResponse | null> {
-  const client = new Client(PUBLIC_API_URL);
   return await client.user.getSession(sessionId);
 }

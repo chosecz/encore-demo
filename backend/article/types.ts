@@ -5,6 +5,7 @@ export interface AllArticlesResponse {
 export interface CreateArticleRequest {
   title: string;
   description: string;
+  author_id: string;
 }
 
 export interface CreateArticleResponse {
@@ -17,6 +18,7 @@ export interface Article {
   title: string;
   description: string;
   status: "draft" | "published" | "archived";
+  author_id: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

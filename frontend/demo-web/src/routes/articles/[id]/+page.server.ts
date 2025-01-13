@@ -1,11 +1,10 @@
-import { PUBLIC_API_URL } from "$env/static/public";
-import Client from "$lib/encore-client";
+import { Client } from "$lib/server/client";
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, locals }) => {
   try {
-    const client = new Client(PUBLIC_API_URL);
+    const client = Client(locals.session?.id ?? "");
     const article = await client.article.get(params.id);
     return {
       article,
