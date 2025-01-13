@@ -21,34 +21,54 @@ export class ArticleRepository {
   async list(
     includeDeleted?: boolean,
     status?: Article["status"],
-    userID?: string
+    userId?: string
   ): Promise<Article[]> {
     let query;
-    if (status && includeDeleted) {
+    if (status && userId) {
+      // If status and userId provided, show only user's articles with that status
       query = await db.query<Article>`
-          SELECT * FROM article
-          WHERE status = ${status}
-          ORDER BY created_at DESC
-        `;
+        SELECT * FROM article
+        WHERE status = ${status}
+        AND author_id = ${userId}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+      `;
+    } else if (status && includeDeleted) {
+      query = await db.query<Article>`
+        SELECT * FROM article
+        WHERE status = ${status}
+        ORDER BY created_at DESC
+      `;
     } else if (status) {
       query = await db.query<Article>`
-          SELECT * FROM article
-          WHERE status = ${status}
-          AND deleted_at IS NULL
-          ORDER BY created_at DESC
-        `;
+        SELECT * FROM article
+        WHERE status = ${status}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+      `;
+    } else if (userId) {
+      // If only userId provided, show all user's non-deleted articles
+      query = await db.query<Article>`
+        SELECT * FROM article
+        WHERE author_id = ${userId}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+      `;
     } else if (includeDeleted) {
       query = await db.query<Article>`
-          SELECT * FROM article
-          ORDER BY created_at DESC
-        `;
+        SELECT * FROM article
+        ORDER BY created_at DESC
+      `;
     } else {
+      // Default case: show only published, non-deleted articles
       query = await db.query<Article>`
-          SELECT * FROM article
-          WHERE deleted_at IS NULL
-          ORDER BY created_at DESC
-        `;
+        SELECT * FROM article
+        WHERE status = 'published'
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+      `;
     }
+
     const articles: Article[] = [];
     for await (const article of query) {
       articles.push(article);

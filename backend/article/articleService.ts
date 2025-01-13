@@ -26,9 +26,9 @@ class ArticleService {
   async list(
     includeDeleted?: boolean,
     status?: Article["status"],
-    userID?: string
+    userId?: string
   ): Promise<Article[]> {
-    return await articleRepository.list(includeDeleted, status, userID);
+    return await articleRepository.list(includeDeleted, status, userId);
   }
 
   async create(data: CreateArticleRequest): Promise<Article> {
