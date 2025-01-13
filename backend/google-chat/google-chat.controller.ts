@@ -76,5 +76,9 @@ async function webhook(text: string) {
     headers: { "Content-Type": "application/json; charset=UTF-8" },
     body: JSON.stringify({ text }),
   });
+  if (!res.ok) {
+    const error = (await res.json()) as Object;
+    throw APIError.internal("Failed to send message").withDetails(error);
+  }
   return await res.json();
 }
