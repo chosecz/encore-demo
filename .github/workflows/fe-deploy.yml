@@ -20,6 +20,8 @@ jobs:
       GCP_SERVICE_REGION: ${{ vars.GCP_SERVICE_REGION }}
       PUBLIC_API_URL: ${{ vars.PUBLIC_API_URL }}
       PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
