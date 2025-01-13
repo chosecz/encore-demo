@@ -1,9 +1,5 @@
-import { articleService } from "@article/articleService";
-import { errorHandler } from "@shared/errors";
-import { api } from "encore.dev/api";
-import { getAuthData } from "~encore/auth";
 import {
-  Article,
+  ArticleResponse,
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
@@ -12,23 +8,26 @@ import {
   PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
-} from "./types";
+} from "@article/article.interfaces";
+import { articleService } from "@article/article.service";
+import { errorHandler } from "@shared/errors";
+import { api } from "encore.dev/api";
 
 export const list = api(
   { expose: true, method: "GET", path: "/articles" },
-  async (params: ListArticlesRequest): Promise<ListArticlesResponse> => {
-    const authData = getAuthData();
-    const { userID } = authData || {};
+  async ({
+    includeDeleted = false,
+    status,
+    offset = 0,
+    limit = 10,
+  }: ListArticlesRequest): Promise<ListArticlesResponse> => {
     try {
-      return {
-        articles: await articleService.list(
-          params.includeDeleted,
-          params.status,
-          userID,
-          params.offset,
-          params.limit
-        ),
-      };
+      return await articleService.list({
+        includeDeleted,
+        status,
+        offset,
+        limit,
+      });
     } catch (error) {
       return errorHandler(error, "Failed to list articles");
     }
@@ -49,7 +48,7 @@ export const create = api(
 
 export const get = api(
   { expose: true, method: "GET", path: "/articles/:id" },
-  async ({ id }: { id: string }): Promise<Article> => {
+  async ({ id }: { id: string }): Promise<ArticleResponse> => {
     try {
       return await articleService.get(id);
     } catch (error) {
@@ -61,7 +60,7 @@ export const get = api(
 );
 
 export const update = api(
-  { expose: true, method: "PUT", path: "/articles/:id" },
+  { expose: true, method: "PUT", path: "/articles/:id", auth: true },
   async (params: UpdateArticleRequest): Promise<UpdateArticleResponse> => {
     try {
       await articleService.update(params);
@@ -75,7 +74,7 @@ export const update = api(
 );
 
 export const remove = api(
-  { expose: true, method: "DELETE", path: "/articles/:id" },
+  { expose: true, method: "DELETE", path: "/articles/:id", auth: true },
   async ({ id }: { id: string }): Promise<DeleteArticleResponse> => {
     try {
       await articleService.delete(id);
@@ -92,9 +91,7 @@ export const publish = api(
   { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
   async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
     try {
-      const authData = getAuthData()!;
-      const { userID } = authData;
-      await articleService.publish(id, userID);
+      await articleService.publish(id);
       return { message: "Article published" };
     } catch (error) {
       return errorHandler(error, "Failed to publish article", {

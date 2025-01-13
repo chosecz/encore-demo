@@ -1,11 +1,11 @@
-import { APIError } from "encore.dev/api";
-import { db } from "./db";
+import { db } from "@user/user.db";
 import {
   CreateSessionRequest,
   CreateUserRequest,
   GetUserResponse,
   SessionResponse,
-} from "./types";
+} from "@user/user.interfaces";
+import { APIError } from "encore.dev/api";
 
 export class UserRepository {
   async findById(id: string): Promise<GetUserResponse> {

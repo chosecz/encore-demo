@@ -11,7 +11,8 @@
       "@article/*": ["./article/*"],
       "@email/*": ["./email/*"],
       "@user/*": ["./user/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@google-chat/*": ["./google-chat/*"]
     },
 
     /* Workspace Settings */

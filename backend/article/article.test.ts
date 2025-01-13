@@ -1,27 +1,41 @@
-import { create, get, list, remove, update } from "@article/articleHandler";
+import { create, get, list, remove, update } from "@article/article.controller";
 import { describe, expect, test, vi } from "vitest";
 
-const mockUserId = "503e9fc7-4327-4382-bfb5-447de09daba5";
-let testArticleId: string;
+function mockUserId() {
+  return "503e9fc7-4327-4382-bfb5-447de09daba5";
+}
 
 vi.mock("~encore/auth", () => ({
   getAuthData: () => ({
-    userID: mockUserId,
+    userID: mockUserId(),
   }),
   auth: () => ({
-    userID: mockUserId,
+    userID: mockUserId(),
   }),
   gateway: {
     authHandler: vi.fn(),
   },
 }));
 
+vi.mock("~encore/clients", () => ({
+  user: {
+    getUser: vi.fn().mockResolvedValue({
+      id: mockUserId(),
+      email: "test@example.com",
+      name: "Test User",
+      picture: "https://example.com/picture.jpg",
+    }),
+  },
+}));
+
+let testArticleId: string;
+
 describe("Article API Tests", () => {
   test("should create an article", async () => {
     const resp = await create({
       title: "Test Article",
       description: "This is a test article",
-      author_id: mockUserId,
+      author_id: mockUserId(),
     });
     expect(resp.id).toBeDefined();
     testArticleId = resp.id;

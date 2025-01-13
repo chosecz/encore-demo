@@ -1,10 +1,6 @@
-import { GetUserResponse } from "@user/types";
+import { GetUserResponse } from "@user/user.interfaces";
 import { Query } from "encore.dev/api";
 import { Max, Min } from "encore.dev/validate";
-
-export interface AllArticlesResponse {
-  articles: Article[];
-}
 
 export interface CreateArticleRequest {
   title: string;
@@ -17,7 +13,7 @@ export interface CreateArticleResponse {
   message: string;
 }
 
-export interface Article {
+export interface ArticleResponse {
   id: string;
   title: string;
   description: string;
@@ -46,8 +42,8 @@ export interface DeleteArticleResponse {
 export interface ListArticlesRequest {
   includeDeleted?: boolean;
   status?: "draft" | "published" | "archived";
-  limit?: Query<number> & Max<10>;
-  offset?: Query<number> & Min<0>;
+  limit?: 10 | (Query<number> & Max<10>);
+  offset?: 0 | (Query<number> & Min<0>);
 }
 
 export interface PublishArticleResponse {
@@ -55,7 +51,7 @@ export interface PublishArticleResponse {
 }
 
 export interface ListArticlesResponse {
-  articles: Article[];
+  articles: ArticleResponse[];
 }
 
 export interface PublishArticleEvent {

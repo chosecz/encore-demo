@@ -8,9 +8,9 @@ import {
   GetUserResponse,
   SessionResponse,
   UpdateSessionExpirationRequest,
-} from "@user/types";
+} from "@user/user.interfaces";
+import { userService } from "@user/user.service";
 import { api } from "encore.dev/api";
-import { userService } from "./userService";
 
 export const createUser = api(
   { expose: true, method: "POST", path: "/users/create" },

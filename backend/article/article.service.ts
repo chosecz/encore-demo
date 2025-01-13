@@ -1,14 +1,15 @@
-import { articleRepository } from "@article/articleRepository";
 import {
-  Article,
+  ArticleResponse,
   CreateArticleRequest,
   DeleteArticleResponse,
+  ListArticlesRequest,
+  ListArticlesResponse,
   PublishArticleEvent,
   PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
-} from "@article/types";
-import { userRepository } from "@user/userRepository";
+} from "@article/article.interfaces";
+import { articleRepository } from "@article/article.repository";
 import log from "encore.dev/log";
 import { Topic } from "encore.dev/pubsub";
 
@@ -20,29 +21,15 @@ export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
 );
 
 class ArticleService {
-  async get(id: string): Promise<Article> {
-    const article = await articleRepository.findById(id);
-    const author = await userRepository.findById(article.author_id);
-    return { ...article, author };
+  async get(id: string): Promise<ArticleResponse> {
+    return await articleRepository.findById(id);
   }
 
-  async list(
-    includeDeleted?: boolean,
-    status?: Article["status"],
-    userId?: string,
-    offset?: number,
-    limit?: number
-  ): Promise<Article[]> {
-    return await articleRepository.list(
-      includeDeleted,
-      status,
-      userId,
-      offset,
-      limit
-    );
+  async list(params: ListArticlesRequest): Promise<ListArticlesResponse> {
+    return { articles: await articleRepository.list(params) };
   }
 
-  async create(data: CreateArticleRequest): Promise<Article> {
+  async create(data: CreateArticleRequest): Promise<ArticleResponse> {
     return await articleRepository.create(data);
   }
 
@@ -56,9 +43,8 @@ class ArticleService {
     return { message: "Article deleted" };
   }
 
-  async publish(id: string, userId: string): Promise<PublishArticleResponse> {
-    // Update the article status with author verification
-    await articleRepository.publish(id, userId);
+  async publish(id: string): Promise<PublishArticleResponse> {
+    await articleRepository.publish(id);
 
     // Publish to pubsub
     log.info("Publishing article to pubsub", { articleId: id });

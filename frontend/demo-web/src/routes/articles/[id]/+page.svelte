@@ -4,10 +4,11 @@
   let { data, form } = $props();
   let article = $derived(data.article);
   let user = $derived(data.user);
+  let nl2br = (text: string) => text.replace(/\n/g, "<br>");
 </script>
 
 <svelte:head>
-  <title>{article.title} - Article Details</title>
+  <title>{article.title}</title>
 </svelte:head>
 
 <div class="article-detail">
@@ -20,7 +21,7 @@
   </div>
 
   <div class="description">
-    <p>{article.description}</p>
+    <p>{@html nl2br(article.description)}</p>
   </div>
 
   {#if form?.error}

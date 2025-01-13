@@ -3,8 +3,8 @@ import {
   CreateUserRequest,
   GetUserResponse,
   SessionResponse,
-} from "./types";
-import { userRepository } from "./userRepository";
+} from "@user/user.interfaces";
+import { userRepository } from "@user/user.repository";
 
 class UserService {
   async getUserById(id: string): Promise<GetUserResponse> {
