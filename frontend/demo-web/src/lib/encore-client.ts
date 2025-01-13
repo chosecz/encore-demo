@@ -66,11 +66,11 @@ export interface ClientOptions {
      * request either by passing in a static object or by passing in
      * a function which returns a new object for each request.
      */
-    auth?: shared.AuthParams | AuthDataGenerator
+    auth?: auth.AuthParams | AuthDataGenerator
 }
 
 export namespace article {
-    export interface Article {
+    export interface ArticleResponse {
         id: string
         title: string
         description: string
@@ -100,12 +100,12 @@ export namespace article {
     export interface ListArticlesRequest {
         includeDeleted?: boolean
         status?: "draft" | "published" | "archived"
-        limit?: number
-        offset?: number
+        limit?: 10 | number
+        offset?: 0 | number
     }
 
     export interface ListArticlesResponse {
-        articles: Article[]
+        articles: ArticleResponse[]
     }
 
     export interface PublishArticleResponse {
@@ -134,10 +134,10 @@ export namespace article {
             return await resp.json() as CreateArticleResponse
         }
 
-        public async get(id: string): Promise<Article> {
+        public async get(id: string): Promise<ArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/articles/${encodeURIComponent(id)}`)
-            return await resp.json() as Article
+            return await resp.json() as ArticleResponse
         }
 
         public async list(params: ListArticlesRequest): Promise<ListArticlesResponse> {
@@ -174,7 +174,7 @@ export namespace article {
     }
 }
 
-export namespace shared {
+export namespace auth {
     export interface AuthParams {
         authorization: string
     }
@@ -469,8 +469,8 @@ type CallParameters = Omit<RequestInit, "method" | "body" | "headers"> & {
 
 // AuthDataGenerator is a function that returns a new instance of the authentication data required by this API
 export type AuthDataGenerator = () =>
-  | shared.AuthParams
-  | Promise<shared.AuthParams | undefined>
+  | auth.AuthParams
+  | Promise<auth.AuthParams | undefined>
   | undefined;
 
 // A fetcher is the prototype for the inbuilt Fetch function
@@ -518,7 +518,7 @@ class BaseClient {
     }
 
     async getAuthData(): Promise<CallParameters | undefined> {
-        let authData: shared.AuthParams | undefined;
+        let authData: auth.AuthParams | undefined;
 
         // If authorization data generator is present, call it and add the returned data to the request
         if (this.authGenerator) {
