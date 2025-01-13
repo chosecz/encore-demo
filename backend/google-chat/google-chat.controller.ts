@@ -14,6 +14,8 @@ import { Subscription } from "encore.dev/pubsub";
 import { article } from "~encore/clients";
 
 const WEB_URL = secret("WEB_URL");
+const GOOGLE_CHAT_TOKEN = secret("GOOGLE_CHAT_TOKEN");
+const GOOGLE_CHAT_KEY = secret("GOOGLE_CHAT_KEY");
 
 // Send a message to google chat
 export const sendMessage = api(
@@ -66,8 +68,7 @@ const _ = new Subscription(PublishedArticleTopic, "send-chat-message", {
 });
 
 async function webhook(text: string) {
-  const url =
-    "https://chat.googleapis.com/v1/spaces/AAAAi9NJE3U/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=ACCtSHFfeZp1rYc9ZzeM1_QLmw6bvyCq06gOfwHSbRI";
+  const url = `https://chat.googleapis.com/v1/spaces/AAAAi9NJE3U/messages?key=${GOOGLE_CHAT_KEY}&token=${GOOGLE_CHAT_TOKEN}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=UTF-8" },
