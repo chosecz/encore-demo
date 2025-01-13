@@ -28,7 +28,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 
 export async function validateSessionToken(
   sessionToken: string
-): Promise<user.SessionResponse | null> {
+): Promise<{ session: user.SessionResponse; user: user.GetUserResponse } | null> {
   if (!sessionToken) {
     return null;
   }
@@ -39,7 +39,8 @@ export async function validateSessionToken(
     if (new Date(session.expiresAt) <= new Date()) {
       return null;
     }
-    return session;
+    const user = await client.user.getUser(session.userId);
+    return { session, user };
   } catch (error) {
     return null;
   }

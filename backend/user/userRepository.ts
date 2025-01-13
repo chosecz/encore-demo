@@ -83,6 +83,15 @@ export class UserRepository {
       WHERE expires_at <= NOW()
     `;
   }
+
+  async updateSessionExpiration(id: string, expiresAt: Date): Promise<void> {
+    await db.exec`
+      UPDATE sessions
+      SET expires_at = ${expiresAt},
+          updated_at = NOW()
+      WHERE id = ${id}
+    `;
+  }
 }
 
 export const userRepository = new UserRepository();

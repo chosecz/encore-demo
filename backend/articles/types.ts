@@ -48,3 +48,7 @@ export interface PublishArticleResponse {
 export interface ListArticlesResponse {
   articles: Article[];
 }
+
+export interface PublishArticleEvent {
+  articleId: string;
+}

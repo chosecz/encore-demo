@@ -7,6 +7,7 @@ import {
   GetUserRequest,
   GetUserResponse,
   SessionResponse,
+  UpdateSessionExpirationRequest,
 } from "@user/types";
 import { api } from "encore.dev/api";
 import { errorHandler } from "../shared/errors";
@@ -76,6 +77,21 @@ export const deleteSession = api(
       await userService.deleteSession(id);
     } catch (error) {
       return errorHandler(error, "Failed to delete session");
+    }
+  }
+);
+
+export const updateSessionExpiration = api(
+  {
+    expose: true,
+    method: "POST",
+    path: "/users/sessions/:id/update-expiration",
+  },
+  async ({ id, expiresAt }: UpdateSessionExpirationRequest): Promise<void> => {
+    try {
+      await userService.updateSessionExpiration(id, expiresAt);
+    } catch (error) {
+      return errorHandler(error, "Failed to update session expiration");
     }
   }
 );

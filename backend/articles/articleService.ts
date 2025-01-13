@@ -5,14 +5,11 @@ import {
   Article,
   CreateArticleRequest,
   DeleteArticleResponse,
+  PublishArticleEvent,
   PublishArticleResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "./types";
-
-export interface PublishArticleEvent {
-  articleId: string;
-}
 
 export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
   "published-article",

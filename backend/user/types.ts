@@ -47,3 +47,8 @@ export interface SessionResponse {
 export interface GetSessionRequest {
   id: string;
 }
+
+export interface UpdateSessionExpirationRequest {
+  id: string;
+  expiresAt: Date;
+}

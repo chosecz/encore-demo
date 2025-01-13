@@ -4,10 +4,8 @@ import log from "encore.dev/log";
 import { Subscription } from "encore.dev/pubsub";
 import { Resend } from "resend";
 import { article } from "~encore/clients";
-import {
-  PublishedArticleTopic,
-  type PublishArticleEvent,
-} from "../articles/articleService";
+import { PublishedArticleTopic } from "../articles/articleService";
+import { PublishArticleEvent } from "../articles/types";
 import { SendEmailRequest, SendEmailResponse } from "./types";
 
 const resendApiKey = secret("RESEND_API_KEY");

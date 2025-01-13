@@ -34,6 +34,10 @@ class UserService {
   async cleanupExpiredSessions(): Promise<void> {
     await userRepository.deleteExpiredSessions();
   }
+
+  async updateSessionExpiration(id: string, expiresAt: Date): Promise<void> {
+    await userRepository.updateSessionExpiration(id, expiresAt);
+  }
 }
 
 export const userService = new UserService();

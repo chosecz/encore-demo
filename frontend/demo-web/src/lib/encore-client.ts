@@ -147,6 +147,10 @@ export namespace user {
         updatedAt: string
     }
 
+    export interface UpdateSessionExpirationRequest {
+        expiresAt: string
+    }
+
     export class ServiceClient {
         private baseClient: BaseClient
 
@@ -186,6 +190,10 @@ export namespace user {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/users/get-from-google-id/${encodeURIComponent(googleId)}`)
             return await resp.json() as GetUserResponse
+        }
+
+        public async updateSessionExpiration(id: string, params: UpdateSessionExpirationRequest): Promise<void> {
+            await this.baseClient.callAPI("POST", `/users/sessions/${encodeURIComponent(id)}/update-expiration`, JSON.stringify(params))
         }
     }
 }
