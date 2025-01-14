@@ -1,10 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import Button from "$lib/components/Button.svelte";
 
   let { data, form } = $props();
   let article = $derived(data.article);
   let user = $derived(data.user);
   let nl2br = (text: string) => text.replace(/\n/g, "<br>");
+
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete this article?");
+  }
 </script>
 
 <svelte:head>
@@ -21,6 +26,10 @@
     <span class="author">Author: {article.author.name}</span>
   </div>
 
+  {#if article.image_url}
+    <img class="article-image" src={article.image_url} alt={article.title} />
+  {/if}
+
   <div class="description">
     <p>{@html nl2br(article.description)}</p>
   </div>
@@ -30,20 +39,39 @@
   {/if}
 
   {#if article.status === "draft" && article.author_id === user?.id}
-    <form method="post" action="?/publish" use:enhance>
-      <input type="hidden" name="articleId" value={article.id} />
-      <button type="submit">Publish</button>
-    </form>
+    <div class="buttons">
+      <form method="post" action="?/publish" use:enhance>
+        <input type="hidden" name="articleId" value={article.id} />
+        <Button type="submit" variant="primary">Publish</Button>
+      </form>
+      <form
+        method="post"
+        action="?/delete"
+        use:enhance={(submitEvent) => {
+          if (!confirmDelete()) {
+            return submitEvent.cancel();
+          }
+        }}
+      >
+        <input type="hidden" name="articleId" value={article.id} />
+        <Button type="submit" variant="secondary">Delete</Button>
+      </form>
+    </div>
   {/if}
 
   <a href="/articles" class="back-link">← Back to Articles</a>
 </div>
 
 <style>
-  .article-detail {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+  .buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .article-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
   }
 
   .metadata {

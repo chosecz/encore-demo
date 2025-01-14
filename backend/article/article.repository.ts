@@ -49,21 +49,30 @@ export class ArticleRepository {
     return articles;
   }
 
-  async create(data: CreateArticleRequest): Promise<Article> {
+  async create(params: CreateArticleRequest): Promise<Article> {
     // check if user exists
-    const userExists = await user.getUser({ id: data.author_id });
+    const userExists = await user.getUser({ id: params.author_id });
     if (!userExists) {
       throw APIError.failedPrecondition(
-        `User with id ${data.author_id} not found`
+        `User with id ${params.author_id} not found`
       );
     }
 
-    // create article
-    const result = await db.queryRow<Article>`
-      INSERT INTO article (title, description, author_id, created_at)
-      VALUES (${data.title}, ${data.description}, ${data.author_id}, NOW())
-      RETURNING *
-    `;
+    let result: Article | null = null;
+    if (params.image_url && params.image_bucket_key) {
+      result = await db.queryRow<Article>`
+        INSERT INTO article (title, description, image_url, image_bucket_key, author_id, created_at)
+        VALUES (${params.title}, ${params.description}, ${params.image_url}, ${params.image_bucket_key}, ${params.author_id}, NOW())
+        RETURNING *
+      `;
+    } else {
+      result = await db.queryRow<Article>`
+        INSERT INTO article (title, description, author_id, created_at)
+        VALUES (${params.title}, ${params.description}, ${params.author_id}, NOW())
+        RETURNING *
+      `;
+    }
+
     if (!result) {
       throw APIError.internal("Failed to create article");
     }
@@ -80,13 +89,25 @@ export class ArticleRepository {
       );
     }
 
-    await db.exec`
-      UPDATE article
-      SET title = ${params.title},
-          description = ${params.description},
-          updated_at = NOW()
-      WHERE id = ${params.id} AND deleted_at IS NULL
-    `;
+    if (params.image_url && params.image_bucket_key) {
+      await db.exec`
+        UPDATE article
+        SET title = ${params.title},
+            description = ${params.description},
+            image_url = ${params.image_url},
+            image_bucket_key = ${params.image_bucket_key},
+            updated_at = NOW()
+        WHERE id = ${params.id} AND deleted_at IS NULL
+      `;
+    } else {
+      await db.exec`
+        UPDATE article
+        SET title = ${params.title},
+            description = ${params.description},
+            updated_at = NOW()
+        WHERE id = ${params.id} AND deleted_at IS NULL
+      `;
+    }
   }
 
   async delete(id: string): Promise<void> {

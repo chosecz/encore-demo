@@ -28,9 +28,17 @@
   </div>
 </header>
 
-{@render children()}
+<div class="container">
+  {@render children()}
+</div>
 
 <style>
+  .container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
   header {
     background-color: #f8f9fa;
     padding: 1rem 2rem;

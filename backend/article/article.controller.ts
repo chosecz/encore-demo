@@ -3,6 +3,7 @@ import {
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
+  FileUploadResponse,
   ListArticlesRequest,
   ListArticlesResponse,
   PublishArticleResponse,
@@ -14,6 +15,7 @@ import { articleService } from "@article/article.service";
 import { errorHandler } from "@shared/errors";
 import { api } from "encore.dev/api";
 
+// Lists articles based on filters
 export const list = api(
   { expose: true, method: "GET", path: "/articles" },
   async ({
@@ -35,6 +37,7 @@ export const list = api(
   }
 );
 
+// Creates an article
 export const create = api(
   { expose: true, method: "POST", path: "/articles" },
   async (data: CreateArticleRequest): Promise<CreateArticleResponse> => {
@@ -47,6 +50,7 @@ export const create = api(
   }
 );
 
+// Gets an article
 export const get = api(
   { expose: true, method: "GET", path: "/articles/:id" },
   async ({ id }: { id: string }): Promise<ArticleResponse> => {
@@ -60,6 +64,7 @@ export const get = api(
   }
 );
 
+// Updates an article
 export const update = api(
   { expose: true, method: "PUT", path: "/articles/:id", auth: true },
   async (params: UpdateArticleRequest): Promise<UpdateArticleResponse> => {
@@ -74,6 +79,7 @@ export const update = api(
   }
 );
 
+// Deletes an article
 export const remove = api(
   { expose: true, method: "DELETE", path: "/articles/:id", auth: true },
   async ({ id }: { id: string }): Promise<DeleteArticleResponse> => {
@@ -88,6 +94,7 @@ export const remove = api(
   }
 );
 
+// Publishes an article
 export const publish = api(
   { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
   async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
@@ -102,9 +109,22 @@ export const publish = api(
   }
 );
 
+// Counts the number of published articles
 export const count = api(
   { expose: false, method: "GET", path: "/articles/count" },
   async (): Promise<PublishedArticlesCountResponse> => {
     return await articleService.publishedArticlesCount();
+  }
+);
+
+// Handles file uploads for article photos
+export const upload = api.raw(
+  { expose: true, method: "POST", path: "/article/upload", bodyLimit: null },
+  async (req, res): Promise<FileUploadResponse> => {
+    try {
+      return await articleService.upload(req, res);
+    } catch (error) {
+      return errorHandler(error, "Failed to upload file");
+    }
   }
 );

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import Button from "$lib/components/Button.svelte";
   const { data, form } = $props();
 </script>
 
@@ -33,18 +34,18 @@
   {#if data.user}
     <div class="create-article">
       <h2>Create New Article</h2>
-      <form method="post" action="?/create" use:enhance>
+      <form method="post" enctype="multipart/form-data" action="?/create" use:enhance>
         {#if form?.error}
           <p class="error">{form.error}</p>
         {/if}
 
         <div class="form-group">
-          <label for="title">Title</label>
+          <label for="title">Title *</label>
           <input type="text" id="title" name="title" value={form?.title ?? ""} required />
         </div>
 
         <div class="form-group">
-          <label for="description">Description</label>
+          <label for="description">Description *</label>
           <textarea
             id="description"
             name="description"
@@ -54,19 +55,18 @@
           ></textarea>
         </div>
 
-        <button type="submit">Create Article</button>
+        <div class="form-group">
+          <label for="photo">Add photo to article</label>
+          <input type="file" id="photo" name="photo" accept="image/*" />
+        </div>
+
+        <Button type="submit" variant="primary">Create Article</Button>
       </form>
     </div>
   {/if}
 </div>
 
 <style>
-  .articles {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
-
   .create-article {
     background: #f8f9fa;
     padding: 1.5rem;

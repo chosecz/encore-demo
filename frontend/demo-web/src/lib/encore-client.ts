@@ -80,12 +80,16 @@ export namespace article {
         "created_at": string
         "updated_at": string
         "deleted_at": string | null
+        "image_url"?: string
+        "image_bucket_key"?: string
     }
 
     export interface CreateArticleRequest {
         title: string
         description: string
         "author_id": string
+        "image_url"?: string
+        "image_bucket_key"?: string
     }
 
     export interface CreateArticleResponse {
@@ -115,6 +119,8 @@ export namespace article {
     export interface UpdateArticleRequest {
         title: string
         description: string
+        "image_url"?: string
+        "image_bucket_key"?: string
     }
 
     export interface UpdateArticleResponse {
@@ -170,6 +176,10 @@ export namespace article {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("PUT", `/articles/${encodeURIComponent(id)}`, JSON.stringify(params))
             return await resp.json() as UpdateArticleResponse
+        }
+
+        public async upload(method: "POST", body?: BodyInit, options?: CallParameters): Promise<Response> {
+            return this.baseClient.callAPI(method, `/article/upload`, body, options)
         }
     }
 }

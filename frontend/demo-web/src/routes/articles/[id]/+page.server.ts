@@ -1,5 +1,5 @@
 import { Client } from "$lib/server/client";
-import { error, fail } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load = (async ({ params, locals }) => {
@@ -27,5 +27,19 @@ export const actions = {
         error: "Failed to publish article",
       });
     }
+  },
+  delete: async (event) => {
+    const client = Client(event.locals.session?.id);
+    const formData = await event.request.formData();
+    const articleId = formData.get("articleId");
+
+    try {
+      await client.article.remove(articleId as string);
+    } catch (e) {
+      return fail(500, {
+        error: "Failed to delete article",
+      });
+    }
+    throw redirect(302, "/articles");
   },
 } satisfies Actions;

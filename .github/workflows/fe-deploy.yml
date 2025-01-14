@@ -30,6 +30,7 @@ jobs:
       PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      BODY_SIZE_LIMIT: 0
     steps:
       - name: Check out code
         uses: actions/checkout@v4
