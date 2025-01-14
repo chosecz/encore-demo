@@ -6,11 +6,19 @@ on:
       - staging
     paths:
       - "frontend/demo-web/**"
+  pull_request:
+    paths:
+      - "frontend/demo-web/**"
 
 jobs:
   test-build-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'prod-eu' || 'staging-eu' }}
+    environment: >-
+      ${{
+        github.ref == 'refs/heads/main' && 'prod-eu' ||
+        github.ref == 'refs/heads/staging' && 'staging-eu' ||
+        format('pr-{0}', github.event.pull_request.number)
+      }}
     defaults:
       run:
         working-directory: frontend/demo-web
