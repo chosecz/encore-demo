@@ -7,6 +7,7 @@ import {
   ListArticlesResponse,
   PublishArticleEvent,
   PublishArticleResponse,
+  PublishedArticlesCountResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "@article/article.interfaces";
@@ -59,6 +60,10 @@ class ArticleService {
     });
 
     return { message: "Article published" };
+  }
+
+  async publishedArticlesCount(): Promise<PublishedArticlesCountResponse> {
+    return { count: await articleRepository.publishedArticlesCount() };
   }
 }
 

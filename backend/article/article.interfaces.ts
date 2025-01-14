@@ -60,3 +60,7 @@ export interface ListArticlesResponse {
 export interface PublishArticleEvent {
   articleId: string;
 }
+
+export interface PublishedArticlesCountResponse {
+  count: number;
+}

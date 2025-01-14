@@ -6,6 +6,7 @@ import {
   ListArticlesRequest,
   ListArticlesResponse,
   PublishArticleResponse,
+  PublishedArticlesCountResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "@article/article.interfaces";
@@ -98,5 +99,12 @@ export const publish = api(
         articleId: id,
       });
     }
+  }
+);
+
+export const count = api(
+  { expose: false, method: "GET", path: "/articles/count" },
+  async (): Promise<PublishedArticlesCountResponse> => {
+    return await articleService.publishedArticlesCount();
   }
 );

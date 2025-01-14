@@ -130,6 +130,13 @@ export class ArticleRepository {
     `;
   }
 
+  async publishedArticlesCount(): Promise<number> {
+    const result = await db.queryRow<{ count: number }>`
+      SELECT COUNT(*) as count FROM article WHERE status = 'published' AND deleted_at IS NULL
+    `;
+    return result?.count || 0;
+  }
+
   private async buildArticleListQuery(
     userID: string | null,
     includeDeleted?: boolean,
