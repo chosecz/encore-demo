@@ -1,5 +1,5 @@
 import { PublishArticleEvent } from "@article/article.interfaces";
-import { PublishedArticleTopic } from "@article/article.service";
+import { PublishedArticleTopic } from "@article/article.topic";
 import { SendEmailRequest, SendEmailResponse } from "@email/email.interfaces";
 import { errorHandler } from "@shared/errors";
 import { api, APIError } from "encore.dev/api";

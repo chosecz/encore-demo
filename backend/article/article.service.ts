@@ -7,23 +7,15 @@ import {
   FileUploadResponse,
   ListArticlesRequest,
   ListArticlesResponse,
-  PublishArticleEvent,
   PublishArticleResponse,
   PublishedArticlesCountResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "@article/article.interfaces";
 import { articleRepository } from "@article/article.repository";
+import { PublishedArticleTopic } from "@article/article.topic";
 import busboy from "busboy";
 import log from "encore.dev/log";
-import { Topic } from "encore.dev/pubsub";
-
-export const PublishedArticleTopic = new Topic<PublishArticleEvent>(
-  "published-article",
-  {
-    deliveryGuarantee: "at-least-once",
-  }
-);
 
 class ArticleService {
   async get(id: string): Promise<ArticleResponse> {
