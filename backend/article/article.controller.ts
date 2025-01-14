@@ -2,10 +2,13 @@ import {
   ArticleResponse,
   CreateArticleRequest,
   CreateArticleResponse,
+  DeleteArticleRequest,
   DeleteArticleResponse,
   FileUploadResponse,
+  GetArticleRequest,
   ListArticlesRequest,
   ListArticlesResponse,
+  PublishArticleRequest,
   PublishArticleResponse,
   PublishedArticlesCountResponse,
   UpdateArticleRequest,
@@ -40,9 +43,9 @@ export const list = api(
 // Creates an article
 export const create = api(
   { expose: true, method: "POST", path: "/articles" },
-  async (data: CreateArticleRequest): Promise<CreateArticleResponse> => {
+  async (params: CreateArticleRequest): Promise<CreateArticleResponse> => {
     try {
-      const article = await articleService.create(data);
+      const article = await articleService.create(params);
       return { id: article.id, message: "Article created" };
     } catch (error) {
       return errorHandler(error, "Failed to create article");
@@ -53,7 +56,7 @@ export const create = api(
 // Gets an article
 export const get = api(
   { expose: true, method: "GET", path: "/articles/:id" },
-  async ({ id }: { id: string }): Promise<ArticleResponse> => {
+  async ({ id }: GetArticleRequest): Promise<ArticleResponse> => {
     try {
       return await articleService.get(id);
     } catch (error) {
@@ -82,7 +85,7 @@ export const update = api(
 // Deletes an article
 export const remove = api(
   { expose: true, method: "DELETE", path: "/articles/:id", auth: true },
-  async ({ id }: { id: string }): Promise<DeleteArticleResponse> => {
+  async ({ id }: DeleteArticleRequest): Promise<DeleteArticleResponse> => {
     try {
       await articleService.delete(id);
       return { message: "Article deleted" };
@@ -97,7 +100,7 @@ export const remove = api(
 // Publishes an article
 export const publish = api(
   { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
-  async ({ id }: { id: string }): Promise<PublishArticleResponse> => {
+  async ({ id }: PublishArticleRequest): Promise<PublishArticleResponse> => {
     try {
       await articleService.publish(id);
       return { message: "Article published" };

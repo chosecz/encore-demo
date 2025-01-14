@@ -117,3 +117,18 @@ export interface FileUploadResponse {
   // Error message if the file upload failed
   error?: string;
 }
+
+export interface PublishArticleRequest {
+  // ID of the article
+  id: string;
+}
+
+export interface DeleteArticleRequest {
+  // ID of the article
+  id: string;
+}
+
+export interface GetArticleRequest {
+  // ID of the article
+  id: string;
+}
