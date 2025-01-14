@@ -71,59 +71,170 @@ export interface ClientOptions {
 
 export namespace article {
     export interface ArticleResponse {
+        /**
+         * Author of the article
+         */
         author: user.GetUserResponse
+
+        /**
+         * ID of the article
+         */
         id: string
+
+        /**
+         * Title of the article
+         */
         title: string
+
+        /**
+         * Description of the article
+         */
         description: string
+
+        /**
+         * Status of the article
+         */
         status: "draft" | "published" | "archived"
+
+        /**
+         * ID of the author
+         */
         "author_id": string
+
+        /**
+         * Date the article was created
+         */
         "created_at": string
+
+        /**
+         * Date the article was last updated
+         */
         "updated_at": string
+
+        /**
+         * Date the article was deleted
+         */
         "deleted_at": string | null
+
+        /**
+         * Public URL of the article image
+         */
         "image_url"?: string
+
+        /**
+         * Bucket key of the article image
+         */
         "image_bucket_key"?: string
     }
 
     export interface CreateArticleRequest {
+        /**
+         * Title of the article
+         */
         title: string
+
+        /**
+         * Description of the article
+         */
         description: string
+
+        /**
+         * ID of the author
+         */
         "author_id": string
+
+        /**
+         * Public URL of the article image
+         */
         "image_url"?: string
+
+        /**
+         * Bucket key of the article image
+         */
         "image_bucket_key"?: string
     }
 
     export interface CreateArticleResponse {
+        /**
+         * ID of the article
+         */
         id: string
+
+        /**
+         * Message of the response
+         */
         message: string
     }
 
     export interface DeleteArticleResponse {
+        /**
+         * Message of the response
+         */
         message: string
     }
 
     export interface ListArticlesRequest {
+        /**
+         * Whether to include deleted articles
+         */
         includeDeleted?: boolean
+
+        /**
+         * Status of the articles to include
+         */
         status?: "draft" | "published" | "archived"
+
+        /**
+         * Limit the number of articles to return
+         */
         limit?: 10 | number
+
+        /**
+         * Offset the number of articles to return
+         */
         offset?: 0 | number
     }
 
     export interface ListArticlesResponse {
+        /**
+         * Articles
+         */
         articles: ArticleResponse[]
     }
 
     export interface PublishArticleResponse {
+        /**
+         * Message of the response
+         */
         message: string
     }
 
     export interface UpdateArticleRequest {
+        /**
+         * Title of the article
+         */
         title: string
+
+        /**
+         * Description of the article
+         */
         description: string
+
+        /**
+         * Public URL of the article image
+         */
         "image_url"?: string
+
+        /**
+         * Bucket key of the article image
+         */
         "image_bucket_key"?: string
     }
 
     export interface UpdateArticleResponse {
+        /**
+         * Message of the response
+         */
         message: string
     }
 
@@ -134,18 +245,27 @@ export namespace article {
             this.baseClient = baseClient
         }
 
+        /**
+         * Creates an article
+         */
         public async create(params: CreateArticleRequest): Promise<CreateArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("POST", `/articles`, JSON.stringify(params))
             return await resp.json() as CreateArticleResponse
         }
 
+        /**
+         * Gets an article
+         */
         public async get(id: string): Promise<ArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/articles/${encodeURIComponent(id)}`)
             return await resp.json() as ArticleResponse
         }
 
+        /**
+         * Lists articles based on filters
+         */
         public async list(params: ListArticlesRequest): Promise<ListArticlesResponse> {
             // Convert our params into the objects we need for the request
             const query = makeRecord<string, string | string[]>({
@@ -160,24 +280,36 @@ export namespace article {
             return await resp.json() as ListArticlesResponse
         }
 
+        /**
+         * Publishes an article
+         */
         public async publish(id: string): Promise<PublishArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("POST", `/articles/${encodeURIComponent(id)}/publish`)
             return await resp.json() as PublishArticleResponse
         }
 
+        /**
+         * Deletes an article
+         */
         public async remove(id: string): Promise<DeleteArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("DELETE", `/articles/${encodeURIComponent(id)}`)
             return await resp.json() as DeleteArticleResponse
         }
 
+        /**
+         * Updates an article
+         */
         public async update(id: string, params: UpdateArticleRequest): Promise<UpdateArticleResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("PUT", `/articles/${encodeURIComponent(id)}`, JSON.stringify(params))
             return await resp.json() as UpdateArticleResponse
         }
 
+        /**
+         * Handles file uploads for article photos
+         */
         public async upload(method: "POST", body?: BodyInit, options?: CallParameters): Promise<Response> {
             return this.baseClient.callAPI(method, `/article/upload`, body, options)
         }
@@ -192,37 +324,104 @@ export namespace auth {
 
 export namespace user {
     export interface CreateSessionRequest {
+        /**
+         * ID of the user
+         */
         userId: string
+
+        /**
+         * Expiration date of the session
+         */
         expiresAt: string
     }
 
     export interface CreateUserRequest {
+        /**
+         * Google ID of the user
+         */
         googleId: string
+
+        /**
+         * Email of the user
+         */
         email: string
+
+        /**
+         * Name of the user
+         */
         name: string
+
+        /**
+         * Public URL of the user's profile picture
+         */
         picture: string
     }
 
     export interface CreateUserResponse {
+        /**
+         * ID of the user
+         */
         id: string
+
+        /**
+         * Message of the response
+         */
+        message: string
     }
 
     export interface GetUserResponse {
+        /**
+         * ID of the user
+         */
         id: string
+
+        /**
+         * Email of the user
+         */
         email: string
+
+        /**
+         * Name of the user
+         */
         name: string
+
+        /**
+         * Public URL of the user's profile picture
+         */
         picture: string
     }
 
     export interface SessionResponse {
+        /**
+         * ID of the session
+         */
         id: string
+
+        /**
+         * ID of the user
+         */
         userId: string
+
+        /**
+         * Expiration date of the session
+         */
         expiresAt: string
+
+        /**
+         * Date the session was created
+         */
         createdAt: string
+
+        /**
+         * Date the session was last updated
+         */
         updatedAt: string
     }
 
     export interface UpdateSessionExpirationRequest {
+        /**
+         * Expiration date of the session
+         */
         expiresAt: string
     }
 

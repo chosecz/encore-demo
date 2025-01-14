@@ -16,7 +16,7 @@ export const cleanupExpiredSessions = api({}, async () => {
 });
 
 // Runs every day at midnight to clean up expired sessions
-const _ = new CronJob("cleanup-expired-sessions", {
+new CronJob("cleanup-expired-sessions", {
   title: "Cleanup expired sessions",
   schedule: "0 0 * * *", // At 00:00 (midnight) every day
   endpoint: cleanupExpiredSessions,
