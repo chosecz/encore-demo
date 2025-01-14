@@ -1,6 +1,7 @@
 import {
   CreateSessionRequest,
   CreateUserRequest,
+  CreateUserResponse,
   GetUserResponse,
   SessionResponse,
 } from "@user/user.interfaces";
@@ -15,8 +16,12 @@ class UserService {
     return await userRepository.findByGoogleId(googleId);
   }
 
-  async createUser(data: CreateUserRequest): Promise<{ id: string }> {
-    return await userRepository.create(data);
+  async createUser(data: CreateUserRequest): Promise<CreateUserResponse> {
+    const result = await userRepository.create(data);
+    return {
+      id: result.id,
+      message: "User created successfully",
+    };
   }
 
   async createSession(data: CreateSessionRequest): Promise<SessionResponse> {

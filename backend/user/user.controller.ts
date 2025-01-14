@@ -1,3 +1,4 @@
+import { errorHandler } from "@shared/errors";
 import {
   CreateSessionRequest,
   CreateUserRequest,
@@ -15,7 +16,11 @@ import { api } from "encore.dev/api";
 export const createUser = api(
   { expose: true, method: "POST", path: "/users/create" },
   async (data: CreateUserRequest): Promise<CreateUserResponse> => {
-    return await userService.createUser(data);
+    try {
+      return await userService.createUser(data);
+    } catch (error) {
+      return errorHandler(error, "Failed to create user");
+    }
   }
 );
 
@@ -24,35 +29,55 @@ export const getUserFromGoogleId = api(
   async ({
     googleId,
   }: GetUserFromGoogleIdRequest): Promise<GetUserResponse> => {
-    return await userService.getUserByGoogleId(googleId);
+    try {
+      return await userService.getUserByGoogleId(googleId);
+    } catch (error) {
+      return errorHandler(error, "Failed to get user from Google ID");
+    }
   }
 );
 
 export const getUser = api(
   { expose: true, method: "GET", path: "/users/:id" },
   async ({ id }: GetUserRequest): Promise<GetUserResponse> => {
-    return await userService.getUserById(id);
+    try {
+      return await userService.getUserById(id);
+    } catch (error) {
+      return errorHandler(error, "Failed to get user by ID");
+    }
   }
 );
 
 export const createSession = api(
   { expose: true, method: "POST", path: "/users/sessions" },
   async (data: CreateSessionRequest): Promise<SessionResponse> => {
-    return await userService.createSession(data);
+    try {
+      return await userService.createSession(data);
+    } catch (error) {
+      return errorHandler(error, "Failed to create session");
+    }
   }
 );
 
 export const getSession = api(
   { expose: true, method: "GET", path: "/users/sessions/:id" },
   async ({ id }: GetSessionRequest): Promise<SessionResponse> => {
-    return await userService.getSession(id);
+    try {
+      return await userService.getSession(id);
+    } catch (error) {
+      return errorHandler(error, "Failed to get session");
+    }
   }
 );
 
 export const deleteSession = api(
   { expose: true, method: "DELETE", path: "/users/sessions/:id" },
   async ({ id }: GetSessionRequest): Promise<void> => {
-    await userService.deleteSession(id);
+    try {
+      await userService.deleteSession(id);
+    } catch (error) {
+      return errorHandler(error, "Failed to delete session");
+    }
   }
 );
 
@@ -63,6 +88,10 @@ export const updateSessionExpiration = api(
     path: "/users/sessions/:id/update-expiration",
   },
   async ({ id, expiresAt }: UpdateSessionExpirationRequest): Promise<void> => {
-    await userService.updateSessionExpiration(id, expiresAt);
+    try {
+      await userService.updateSessionExpiration(id, expiresAt);
+    } catch (error) {
+      return errorHandler(error, "Failed to update session expiration");
+    }
   }
 );
