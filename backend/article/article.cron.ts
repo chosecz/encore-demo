@@ -3,9 +3,9 @@ import { CronJob } from "encore.dev/cron";
 import { article, google_chat } from "~encore/clients";
 
 export const sendPublishedArticlesCount = api({}, async () => {
-  const count = await article.count();
+  const response = await article.count();
   return google_chat.sendMessage({
-    message: `There are ${count} published articles`,
+    message: `There are ${response.count} published articles`,
   });
 });
 
