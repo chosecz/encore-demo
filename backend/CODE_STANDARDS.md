@@ -4,12 +4,12 @@
 
 ```
 backend/
-├── article/           # Feature module for articles
-├── auth/             # Authentication related code
+├── article/          # Article service module
+├── auth/             # Authentication service module
 ├── email/            # Email service module
 ├── google-chat/      # Google Chat integration module
 ├── shared/           # Shared utilities and components
-└── user/             # User management module
+└── user/             # User service module
 ```
 
 ## Architecture Patterns
