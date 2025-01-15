@@ -1,32 +1,26 @@
 import { articleService } from "@article/article.service";
 import { appMeta } from "encore.dev";
-import { api, APIError } from "encore.dev/api";
+import { api } from "encore.dev/api";
 import { CronJob } from "encore.dev/cron";
 import { google_chat } from "~encore/clients";
 
 export const sendPublishedArticlesCount = api(
   {},
   async (): Promise<{ message: string }> => {
-    try {
-      const { count } = await articleService.publishedArticlesCount();
-      const today = new Date();
-      const formattedDate = today.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-      });
+    const { count } = await articleService.publishedArticlesCount();
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    });
 
-      await google_chat.sendMessage({
-        message: `${formattedDate} we have ${count} published articles in ${resolveRegion(
-          appMeta().environment.name
-        )}`,
-      });
-      return { message: "Published articles count sent" };
-    } catch (error) {
-      throw APIError.internal(
-        "Failed to send published articles count"
-      ).withDetails({ error });
-    }
+    await google_chat.sendMessage({
+      message: `${formattedDate} we have ${count} published articles in ${resolveRegion(
+        appMeta().environment.name
+      )}`,
+    });
+    return { message: "Published articles count sent" };
   }
 );
 

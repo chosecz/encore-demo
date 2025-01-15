@@ -37,9 +37,9 @@ const _ = new Subscription(PublishedArticleTopic, "send-chat-message", {
     });
     const _article = await article.get({ id: event.articleId });
     if (!_article) {
-      log.error("Article not found", { articleID: event.articleId });
+      log.error("Article not found", { articleId: event.articleId });
       throw APIError.notFound("Article not found").withDetails({
-        articleID: event.articleId,
+        articleId: event.articleId,
       });
     }
 
