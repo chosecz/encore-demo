@@ -18,21 +18,27 @@ export class ArticleRepository {
       SELECT * FROM article WHERE id = ${id} AND deleted_at IS NULL
     `;
     if (!article) {
-      throw APIError.notFound("Article not found");
+      throw APIError.notFound("Article not found").withDetails({
+        articleId: id,
+      });
     }
     const author = await user.getUser({ id: article.author_id });
     return { ...article, author };
   }
 
-  async list(params: ListArticlesRequest): Promise<ArticleResponse[]> {
+  async list({
+    includeDeleted = false,
+    status,
+    offset = 0,
+    limit = 10,
+  }: ListArticlesRequest): Promise<ArticleResponse[]> {
     const { userID = null } = getAuthData() || {};
-
     const _articles = await this.buildArticleListQuery(
       userID,
-      params.includeDeleted,
-      params.status,
-      params.offset,
-      params.limit
+      includeDeleted,
+      status,
+      offset,
+      limit
     );
 
     const articles: ArticleResponse[] = [];
@@ -53,9 +59,9 @@ export class ArticleRepository {
     // check if user exists
     const userExists = await user.getUser({ id: params.author_id });
     if (!userExists) {
-      throw APIError.failedPrecondition(
-        `User with id ${params.author_id} not found`
-      );
+      throw APIError.failedPrecondition(`User not found`).withDetails({
+        userId: params.author_id,
+      });
     }
 
     let result: Article | null = null;
