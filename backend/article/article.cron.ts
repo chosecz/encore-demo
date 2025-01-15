@@ -26,7 +26,7 @@ export const sendPublishedArticlesCount = api({}, async () => {
 // Sends notification with number of published articles every day at 9:00 AM
 new CronJob("published-articles", {
   title: "Count published articles",
-  schedule: "0 9 * * *",
+  schedule: "0 8 * * *",
   endpoint: sendPublishedArticlesCount,
 });
 
