@@ -23,7 +23,9 @@ export const sendPublishedArticlesCount = api(
       });
       return { message: "Published articles count sent" };
     } catch (error) {
-      throw APIError.internal("Failed to send published articles count");
+      throw APIError.internal(
+        "Failed to send published articles count"
+      ).withDetails({ error });
     }
   }
 );

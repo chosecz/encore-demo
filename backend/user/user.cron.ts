@@ -12,7 +12,11 @@ export const cleanupExpiredSessions = api(
       log.info("Successfully cleaned up expired sessions");
       return { message: "Expired sessions cleaned up" };
     } catch (error) {
-      throw APIError.internal("Failed to cleanup expired sessions");
+      throw APIError.internal("Failed to cleanup expired sessions").withDetails(
+        {
+          error,
+        }
+      );
     }
   }
 );
