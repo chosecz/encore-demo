@@ -1,13 +1,13 @@
 import { errorHandler } from "@shared/errors";
+import { userService } from "@user/user.service";
 import { api } from "encore.dev/api";
 import { CronJob } from "encore.dev/cron";
 import log from "encore.dev/log";
-import { user } from "~encore/clients";
 
 export const cleanupExpiredSessions = api({}, async () => {
   try {
     log.info("Starting cleanup of expired sessions");
-    await user.cleanupExpiredSessions();
+    await userService.cleanupExpiredSessions();
     log.info("Successfully cleaned up expired sessions");
     return { message: "Expired sessions cleaned up" };
   } catch (error) {
