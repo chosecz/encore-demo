@@ -75,6 +75,23 @@ The codebase follows a clear service-layer architecture with the following compo
 - URL generation for public access
 - File size and type validation
 
+### Message Topics (`*.topic.ts`)
+
+- Clear topic naming conventions
+- Type-safe message definitions
+- Publisher implementation patterns
+- Subscriber implementation patterns
+- Message validation
+- Error handling for publish/subscribe
+- Dead letter queue handling
+- Message retry policies
+- Message ordering guarantees
+- Proper logging and monitoring
+- Schema versioning
+- Message size limitations
+- Topic access control
+- Message acknowledgment patterns
+
 ### Database Layer (`*.db.ts`)
 
 - Clear table/collection definitions
@@ -107,23 +124,6 @@ The codebase follows a clear service-layer architecture with the following compo
   - `describe` blocks for feature/component
   - `it` blocks for specific behaviors
   - Clear failure messages
-
-### Message Topics (`*.topic.ts`)
-
-- Clear topic naming conventions
-- Type-safe message definitions
-- Publisher implementation patterns
-- Subscriber implementation patterns
-- Message validation
-- Error handling for publish/subscribe
-- Dead letter queue handling
-- Message retry policies
-- Message ordering guarantees
-- Proper logging and monitoring
-- Schema versioning
-- Message size limitations
-- Topic access control
-- Message acknowledgment patterns
 
 ## Coding Standards
 
