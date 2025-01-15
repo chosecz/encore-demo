@@ -1,15 +1,13 @@
 import { APIError } from "encore.dev/api";
 import log from "encore.dev/log";
 
-export function errorHandler(
-  error: any,
-  message: string,
-  metadata?: object
-): never {
+export function globalErrorHandler(error: any): never {
+  const message =
+    error instanceof Error ? error.message : "An unknown error occurred";
   log.error(message, {
     error: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
-    ...metadata,
+    details: error instanceof APIError ? error.details : undefined,
   });
   if (error instanceof APIError) {
     throw error;

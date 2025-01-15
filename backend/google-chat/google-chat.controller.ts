@@ -6,7 +6,6 @@ import {
   SendMessageRequest,
   SendMessageResponse,
 } from "@google-chat/google-chat.interfaces";
-import { errorHandler } from "@shared/errors";
 import { api } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
@@ -23,15 +22,11 @@ export const sendMessage = api(
   async ({ message }: SendMessageRequest): Promise<SendMessageResponse> => {
     log.info("Received request to send message", { message });
 
-    try {
-      const res = await webhook(message);
-      log.info("Message successfully sent", { res });
-      return {
-        success: true,
-      };
-    } catch (error) {
-      return errorHandler(error, "Failed to send message");
-    }
+    const res = await webhook(message);
+    log.info("Message successfully sent", { res });
+    return {
+      success: true,
+    };
   }
 );
 

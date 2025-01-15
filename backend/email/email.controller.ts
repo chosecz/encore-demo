@@ -1,7 +1,6 @@
 import { PublishArticleEvent } from "@article/article.interfaces";
 import { PublishedArticleTopic } from "@article/article.topic";
 import { SendEmailRequest, SendEmailResponse } from "@email/email.interfaces";
-import { errorHandler } from "@shared/errors";
 import { api, APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import log from "encore.dev/log";
@@ -23,32 +22,25 @@ export const sendEmail = api(
   }: SendEmailRequest): Promise<SendEmailResponse> => {
     log.info("Received request to send email", { email, subject });
 
-    try {
-      const resend = new Resend(resendApiKey());
+    const resend = new Resend(resendApiKey());
 
-      const { data, error } = await resend.emails.send({
-        from: "Groupon <noreply@sonic.suprovoucher.com>",
-        to: email,
-        subject: subject,
-        text,
-        html,
-      });
+    const { data, error } = await resend.emails.send({
+      from: "Groupon <noreply@sonic.suprovoucher.com>",
+      to: email,
+      subject: subject,
+      text,
+      html,
+    });
 
-      if (error) {
-        throw APIError.internal("Failed to send email").withDetails({
-          error: error.message,
-          name: error.name,
-        });
-      }
-
-      log.info("Email successfully sent", { id: data?.id });
-      return {
-        id: data?.id,
-        success: true,
-      };
-    } catch (error) {
-      return errorHandler(error, "Failed to send email");
+    if (error) {
+      throw APIError.internal("Failed to send email").withDetails(error);
     }
+
+    log.info("Email successfully sent", { id: data?.id });
+    return {
+      id: data?.id,
+      success: true,
+    };
   }
 );
 

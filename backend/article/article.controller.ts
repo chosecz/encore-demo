@@ -15,28 +15,21 @@ import {
   UpdateArticleResponse,
 } from "@article/article.interfaces";
 import { articleService } from "@article/article.service";
-import { errorHandler } from "@shared/errors";
 import { api } from "encore.dev/api";
+
+// Gets an article
+export const get = api(
+  { expose: true, method: "GET", path: "/articles/:id" },
+  async ({ id }: GetArticleRequest): Promise<ArticleResponse> => {
+    return await articleService.get(id);
+  }
+);
 
 // Lists articles based on filters
 export const list = api(
   { expose: true, method: "GET", path: "/articles" },
-  async ({
-    includeDeleted = false,
-    status,
-    offset = 0,
-    limit = 10,
-  }: ListArticlesRequest): Promise<ListArticlesResponse> => {
-    try {
-      return await articleService.list({
-        includeDeleted,
-        status,
-        offset,
-        limit,
-      });
-    } catch (error) {
-      return errorHandler(error, "Failed to list articles");
-    }
+  async (params: ListArticlesRequest): Promise<ListArticlesResponse> => {
+    return await articleService.list(params);
   }
 );
 
@@ -44,26 +37,8 @@ export const list = api(
 export const create = api(
   { expose: true, method: "POST", path: "/articles" },
   async (params: CreateArticleRequest): Promise<CreateArticleResponse> => {
-    try {
-      const article = await articleService.create(params);
-      return { id: article.id, message: "Article created" };
-    } catch (error) {
-      return errorHandler(error, "Failed to create article");
-    }
-  }
-);
-
-// Gets an article
-export const get = api(
-  { expose: true, method: "GET", path: "/articles/:id" },
-  async ({ id }: GetArticleRequest): Promise<ArticleResponse> => {
-    try {
-      return await articleService.get(id);
-    } catch (error) {
-      return errorHandler(error, "Failed to get article", {
-        articleId: id,
-      });
-    }
+    const article = await articleService.create(params);
+    return { id: article.id, message: "Article created" };
   }
 );
 
@@ -71,14 +46,8 @@ export const get = api(
 export const update = api(
   { expose: true, method: "PUT", path: "/articles/:id", auth: true },
   async (params: UpdateArticleRequest): Promise<UpdateArticleResponse> => {
-    try {
-      await articleService.update(params);
-      return { message: "Article updated" };
-    } catch (error) {
-      return errorHandler(error, "Failed to update article", {
-        articleId: params.id,
-      });
-    }
+    await articleService.update(params);
+    return { message: "Article updated" };
   }
 );
 
@@ -86,14 +55,8 @@ export const update = api(
 export const remove = api(
   { expose: true, method: "DELETE", path: "/articles/:id", auth: true },
   async ({ id }: DeleteArticleRequest): Promise<DeleteArticleResponse> => {
-    try {
-      await articleService.delete(id);
-      return { message: "Article deleted" };
-    } catch (error) {
-      return errorHandler(error, "Failed to delete article", {
-        articleId: id,
-      });
-    }
+    await articleService.delete(id);
+    return { message: "Article deleted" };
   }
 );
 
@@ -101,14 +64,8 @@ export const remove = api(
 export const publish = api(
   { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
   async ({ id }: PublishArticleRequest): Promise<PublishArticleResponse> => {
-    try {
-      await articleService.publish(id);
-      return { message: "Article published" };
-    } catch (error) {
-      return errorHandler(error, "Failed to publish article", {
-        articleId: id,
-      });
-    }
+    await articleService.publish(id);
+    return { message: "Article published" };
   }
 );
 
@@ -124,10 +81,6 @@ export const count = api(
 export const upload = api.raw(
   { expose: true, method: "POST", path: "/article/upload", bodyLimit: null },
   async (req, res): Promise<FileUploadResponse> => {
-    try {
-      return await articleService.upload(req, res);
-    } catch (error) {
-      return errorHandler(error, "Failed to upload file");
-    }
+    return await articleService.upload(req, res);
   }
 );

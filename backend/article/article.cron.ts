@@ -1,32 +1,37 @@
+import { articleService } from "@article/article.service";
 import { appMeta } from "encore.dev";
 import { api, APIError } from "encore.dev/api";
 import { CronJob } from "encore.dev/cron";
-import { article, google_chat } from "~encore/clients";
+import { google_chat } from "~encore/clients";
 
-export const sendPublishedArticlesCount = api({}, async () => {
-  try {
-    const response = await article.count();
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
+export const sendPublishedArticlesCount = api(
+  {},
+  async (): Promise<{ message: string }> => {
+    try {
+      const { count } = await articleService.publishedArticlesCount();
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      });
 
-    return await google_chat.sendMessage({
-      message: `${formattedDate} we have ${
-        response.count
-      } published articles in ${resolveRegion(appMeta().environment.name)}`,
-    });
-  } catch (error) {
-    throw APIError.internal("Failed to send published articles count");
+      await google_chat.sendMessage({
+        message: `${formattedDate} we have ${count} published articles in ${resolveRegion(
+          appMeta().environment.name
+        )}`,
+      });
+      return { message: "Published articles count sent" };
+    } catch (error) {
+      throw APIError.internal("Failed to send published articles count");
+    }
   }
-});
+);
 
 // Sends notification with number of published articles every day at 9:00 AM
 new CronJob("published-articles", {
   title: "Count published articles",
-  schedule: "0 9 * * *",
+  schedule: "0 8 * * *",
   endpoint: sendPublishedArticlesCount,
 });
 
