@@ -10,6 +10,13 @@ This is a demo project for Groupon using Encore.dev. It is a simple API for mana
 - **Linux:** `curl -L https://encore.dev/install.sh | bash`
 - **Windows:** `iwr https://encore.dev/install.ps1 | iex`
 
+**Docker for local development:**
+
+You need to have Docker desktop (or similar) installed and running on your machine.
+
+- **macOS:** https://docs.docker.com/desktop/setup/install/mac-install/
+- **Windows:** https://docs.docker.com/desktop/setup/install/windows-install/
+
 ## Install Dependencies
 
 ```bash
