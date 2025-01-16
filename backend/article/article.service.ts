@@ -15,7 +15,10 @@ import {
 import { articleRepository } from "@article/article.repository";
 import { PublishedArticleTopic } from "@article/article.topic";
 import busboy from "busboy";
+import { APIError } from "encore.dev/api";
 import log from "encore.dev/log";
+import { getAuthData } from "~encore/auth";
+import { user } from "~encore/clients";
 
 class ArticleService {
   async get(id: string): Promise<ArticleResponse> {
@@ -26,21 +29,59 @@ class ArticleService {
     return { articles: await articleRepository.list(params) };
   }
 
-  async create(data: CreateArticleRequest): Promise<Article> {
-    return await articleRepository.create(data);
+  async create(params: CreateArticleRequest): Promise<Article> {
+    // check if user exists
+    const userExists = await user.getUser({ id: params.author_id });
+    if (!userExists) {
+      throw APIError.failedPrecondition(`User not found`).withDetails({
+        userId: params.author_id,
+      });
+    }
+    return await articleRepository.create(params);
   }
 
   async update(params: UpdateArticleRequest): Promise<UpdateArticleResponse> {
+    const { userID = null } = getAuthData() || {};
+
+    const article = await articleRepository.findById(params.id);
+    if (article.author_id !== userID) {
+      throw APIError.permissionDenied(
+        "Only the author can update this article"
+      );
+    }
+
     await articleRepository.update(params);
     return { message: "Article updated" };
   }
 
   async delete(id: string): Promise<DeleteArticleResponse> {
+    const { userID = null } = getAuthData() || {};
+
+    const article = await articleRepository.findById(id);
+    if (article.author_id !== userID) {
+      throw APIError.permissionDenied(
+        "Only the author can delete this article"
+      );
+    }
+
     await articleRepository.delete(id);
     return { message: "Article deleted" };
   }
 
   async publish(id: string): Promise<PublishArticleResponse> {
+    // get article
+    const article = await articleRepository.findById(id);
+
+    // get user id
+    const { userID = null } = getAuthData() || {};
+
+    // check if user is the author
+    if (article.author_id !== userID) {
+      throw APIError.permissionDenied(
+        "Only the author can publish this article"
+      );
+    }
+
     await articleRepository.publish(id);
 
     // Publish to pubsub

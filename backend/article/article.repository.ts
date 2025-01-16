@@ -56,14 +56,7 @@ export class ArticleRepository {
   }
 
   async create(params: CreateArticleRequest): Promise<Article> {
-    // check if user exists
-    const userExists = await user.getUser({ id: params.author_id });
-    if (!userExists) {
-      throw APIError.failedPrecondition(`User not found`).withDetails({
-        userId: params.author_id,
-      });
-    }
-
+    log.info("Creating article", { params });
     let result: Article | null = null;
     if (params.image_url && params.image_bucket_key) {
       result = await db.queryRow<Article>`
@@ -86,15 +79,7 @@ export class ArticleRepository {
   }
 
   async update(params: UpdateArticleRequest): Promise<void> {
-    const { userID = null } = getAuthData() || {};
-
-    const article = await this.findById(params.id);
-    if (article.author_id !== userID) {
-      throw APIError.permissionDenied(
-        "Only the author can update this article"
-      );
-    }
-
+    log.info("Updating article", { articleId: params.id });
     if (params.image_url && params.image_bucket_key) {
       await db.exec`
         UPDATE article
@@ -117,15 +102,7 @@ export class ArticleRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const { userID = null } = getAuthData() || {};
-
-    const article = await this.findById(id);
-    if (article.author_id !== userID) {
-      throw APIError.permissionDenied(
-        "Only the author can delete this article"
-      );
-    }
-
+    log.info("Deleting article", { articleId: id });
     await db.exec`
       UPDATE article
       SET deleted_at = NOW()
@@ -134,19 +111,6 @@ export class ArticleRepository {
   }
 
   async publish(id: string): Promise<void> {
-    // get article
-    const article = await this.findById(id);
-
-    // get user id
-    const { userID = null } = getAuthData() || {};
-
-    // check if user is the author
-    if (article.author_id !== userID) {
-      throw APIError.permissionDenied(
-        "Only the author can publish this article"
-      );
-    }
-
     // update article status
     log.info("Updating article status to published", { articleId: id });
     await db.exec`
