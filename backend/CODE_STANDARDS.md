@@ -1,17 +1,5 @@
 # Backend Code Standards
 
-## Project Structure
-
-```
-backend/
-├── article/          # Article service module
-├── auth/             # Authentication service module
-├── email/            # Email service module
-├── google-chat/      # Google Chat integration module
-├── shared/           # Shared utilities and components
-└── user/             # User service module
-```
-
 ## Architecture Patterns
 
 ### Service Layer Architecture
