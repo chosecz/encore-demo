@@ -21,13 +21,13 @@
 
   <div class="metadata">
     <span class="status">Status: {article.status}</span>
-    <span class="date">Created: {new Date(article.created_at).toLocaleDateString()}</span>
-    <span class="date">Updated: {new Date(article.updated_at).toLocaleDateString()}</span>
+    <span class="date">Created: {new Date(article.createdAt).toLocaleDateString()}</span>
+    <span class="date">Updated: {new Date(article.updatedAt).toLocaleDateString()}</span>
     <span class="author">Author: {article.author.name}</span>
   </div>
 
-  {#if article.image_url}
-    <img class="article-image" src={article.image_url} alt={article.title} />
+  {#if article.imageUrl}
+    <img class="article-image" src={article.imageUrl} alt={article.title} />
   {/if}
 
   <div class="description">
@@ -38,7 +38,7 @@
     <p class="error">{form.error}</p>
   {/if}
 
-  {#if article.status === "draft" && article.author_id === user?.id}
+  {#if article.status === "draft" && article.authorId === user?.id}
     <div class="buttons">
       <form method="post" action="?/publish" use:enhance>
         <input type="hidden" name="articleId" value={article.id} />

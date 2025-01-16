@@ -6,7 +6,9 @@ import {
   ListArticlesRequest,
   UpdateArticleRequest,
 } from "@article/article.interfaces";
+import { articles } from "@article/article.schema";
 import { GetUserResponse } from "@user/user.interfaces";
+import { and, count, desc, eq, isNull, or } from "drizzle-orm";
 import { APIError } from "encore.dev/api";
 import log from "encore.dev/log";
 import { getAuthData } from "~encore/auth";
@@ -14,15 +16,16 @@ import { user } from "~encore/clients";
 
 export class ArticleRepository {
   async findById(id: string): Promise<ArticleResponse> {
-    const article = await db.queryRow<ArticleResponse>`
-      SELECT * FROM article WHERE id = ${id} AND deleted_at IS NULL
-    `;
+    const [article] = await db
+      .select()
+      .from(articles)
+      .where(eq(articles.id, id));
     if (!article) {
       throw APIError.notFound("Article not found").withDetails({
         articleId: id,
       });
     }
-    const author = await user.getUser({ id: article.author_id });
+    const author = await user.getUser({ id: article.authorId });
     return { ...article, author };
   }
 
@@ -33,171 +36,97 @@ export class ArticleRepository {
     limit = 10,
   }: ListArticlesRequest): Promise<ArticleResponse[]> {
     const { userID = null } = getAuthData() || {};
-    const _articles = await this.buildArticleListQuery(
-      userID,
-      includeDeleted,
-      status,
-      offset,
-      limit
-    );
 
-    const articles: ArticleResponse[] = [];
-    const authors = new Map<string, GetUserResponse>();
+    const conditions = [];
 
-    for await (const article of _articles) {
-      if (!authors.has(article.author_id)) {
-        const author = await user.getUser({ id: article.author_id });
-        authors.set(article.author_id, author);
-      }
-      articles.push({ ...article, author: authors.get(article.author_id)! });
+    // Add user-specific conditions
+    if (userID) {
+      conditions.push(
+        or(eq(articles.authorId, userID), eq(articles.status, "published"))
+      );
     }
 
-    return articles;
+    // Add status filter if provided
+    if (status) {
+      conditions.push(eq(articles.status, status));
+    }
+
+    // Add soft delete condition unless including deleted
+    if (!includeDeleted) {
+      conditions.push(isNull(articles.deletedAt));
+    }
+
+    const response = await db
+      .select()
+      .from(articles)
+      .where(and(...conditions))
+      .orderBy(desc(articles.createdAt))
+      .offset(offset)
+      .limit(limit);
+
+    const authors = new Map<string, GetUserResponse>();
+    const results: ArticleResponse[] = [];
+
+    for (const article of response) {
+      if (!authors.has(article.authorId)) {
+        const author = await user.getUser({ id: article.authorId });
+        authors.set(article.authorId, author);
+      }
+      results.push({ ...article, author: authors.get(article.authorId)! });
+    }
+
+    return results;
   }
 
-  async create(params: CreateArticleRequest): Promise<Article> {
-    log.info("Creating article", { params });
-    let result: Article | null = null;
-    if (params.image_url && params.image_bucket_key) {
-      result = await db.queryRow<Article>`
-        INSERT INTO article (title, description, image_url, image_bucket_key, author_id, created_at)
-        VALUES (${params.title}, ${params.description}, ${params.image_url}, ${params.image_bucket_key}, ${params.author_id}, NOW())
-        RETURNING *
-      `;
-    } else {
-      result = await db.queryRow<Article>`
-        INSERT INTO article (title, description, author_id, created_at)
-        VALUES (${params.title}, ${params.description}, ${params.author_id}, NOW())
-        RETURNING *
-      `;
-    }
+  async create(data: CreateArticleRequest): Promise<Article> {
+    log.info("Creating article", { data });
 
+    const [result] = await db.insert(articles).values(data).returning();
     if (!result) {
       throw APIError.internal("Failed to create article");
     }
+
+    log.info("Article created", { articleId: result.id });
     return result;
   }
 
-  async update(params: UpdateArticleRequest): Promise<void> {
-    log.info("Updating article", { articleId: params.id });
-    if (params.image_url && params.image_bucket_key) {
-      await db.exec`
-        UPDATE article
-        SET title = ${params.title},
-            description = ${params.description},
-            image_url = ${params.image_url},
-            image_bucket_key = ${params.image_bucket_key},
-            updated_at = NOW()
-        WHERE id = ${params.id} AND deleted_at IS NULL
-      `;
-    } else {
-      await db.exec`
-        UPDATE article
-        SET title = ${params.title},
-            description = ${params.description},
-            updated_at = NOW()
-        WHERE id = ${params.id} AND deleted_at IS NULL
-      `;
-    }
+  async update(data: UpdateArticleRequest): Promise<void> {
+    log.info("Updating article", { articleId: data.id });
+
+    await db.update(articles).set(data).where(eq(articles.id, data.id));
+
+    log.info("Article updated", { articleId: data.id });
   }
 
   async delete(id: string): Promise<void> {
     log.info("Deleting article", { articleId: id });
-    await db.exec`
-      UPDATE article
-      SET deleted_at = NOW()
-      WHERE id = ${id} AND deleted_at IS NULL
-    `;
+
+    await db
+      .update(articles)
+      .set({ deletedAt: new Date().toISOString() })
+      .where(eq(articles.id, id));
+
+    log.info("Article deleted", { articleId: id });
   }
 
   async publish(id: string): Promise<void> {
-    // update article status
-    log.info("Updating article status to published", { articleId: id });
-    await db.exec`
-      UPDATE article
-      SET status = 'published',
-          updated_at = NOW()
-      WHERE id = ${id} AND deleted_at IS NULL
-    `;
+    log.info("Publishing article", { articleId: id });
+
+    await db
+      .update(articles)
+      .set({ status: "published", updatedAt: new Date().toISOString() })
+      .where(eq(articles.id, id));
+
+    log.info("Article published", { articleId: id });
   }
 
   async publishedArticlesCount(): Promise<number> {
-    const result = await db.queryRow<{ count: number }>`
-      SELECT COUNT(*) as count FROM article WHERE status = 'published' AND deleted_at IS NULL
-    `;
+    const [result] = await db
+      .select({ count: count() })
+      .from(articles)
+      .where(and(eq(articles.status, "published"), isNull(articles.deletedAt)));
+
     return result?.count || 0;
-  }
-
-  private async buildArticleListQuery(
-    userID: string | null,
-    includeDeleted?: boolean,
-    status?: Article["status"],
-    offset: number = 0,
-    limit: number = 10
-  ): Promise<AsyncGenerator<Article>> {
-    // if userID is provided, build query for user's articles
-    if (userID) {
-      if (includeDeleted && status) {
-        return db.query<Article>`
-          SELECT * FROM article
-          WHERE (author_id = ${userID} AND status = ${status})
-          ORDER BY created_at DESC
-          OFFSET ${offset}
-          LIMIT ${limit}
-        `;
-      }
-
-      if (includeDeleted) {
-        return db.query<Article>`
-        SELECT * FROM article
-        WHERE author_id = ${userID}
-        ORDER BY created_at DESC
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `;
-      }
-
-      if (status) {
-        return db.query<Article>`
-          SELECT * FROM article
-          WHERE (author_id = ${userID} AND status = ${status})
-          AND deleted_at IS NULL
-          ORDER BY created_at DESC
-          OFFSET ${offset}
-          LIMIT ${limit}
-        `;
-      }
-
-      return db.query<Article>`
-        SELECT * FROM article
-        WHERE (author_id = ${userID} AND deleted_at IS NULL)
-        OR (status = 'published')
-        ORDER BY created_at DESC
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `;
-    }
-
-    if (status) {
-      return db.query<Article>`
-        SELECT * FROM article
-        WHERE status = ${status}
-        AND deleted_at IS NULL
-        ORDER BY created_at DESC
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `;
-    }
-
-    // Default case: show only published, non-deleted articles
-    return db.query<Article>`
-        SELECT * FROM article
-        WHERE status = 'published'
-        AND deleted_at IS NULL
-        ORDER BY created_at DESC
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `;
   }
 }
 
