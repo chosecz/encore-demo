@@ -1,7 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  bigint,
-  boolean,
   foreignKey,
   pgTable,
   text,
@@ -47,9 +45,3 @@ export const sessions = pgTable(
     }),
   ]
 );
-
-export const schemaMigrations = pgTable("schema_migrations", {
-  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-  version: bigint({ mode: "number" }).primaryKey().notNull(),
-  dirty: boolean().notNull(),
-});
