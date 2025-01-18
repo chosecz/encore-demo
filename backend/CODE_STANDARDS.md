@@ -131,6 +131,23 @@ The codebase follows a clear service-layer architecture with the following compo
   - `it` blocks for specific behaviors
   - Clear failure messages
 
+### Scheduled Tasks (`*.cron.ts`)
+
+- Clearly defined execution intervals using cron syntax
+- Proper error handling and logging
+- Task isolation and single responsibility
+- Retry mechanisms for failed tasks
+- Proper cleanup after execution
+- Monitoring and alerting setup
+- Transaction handling for data consistency
+- Resource cleanup on completion
+- Clear task documentation
+- Consistent logging patterns
+- Error details in failure cases
+- Task status reporting
+- Proper service integration
+- Idempotent operations
+
 ## Coding Standards
 
 ### TypeScript Usage
@@ -315,20 +332,3 @@ The codebase follows a clear service-layer architecture with the following compo
 - Proper timestamp handling with timezone consideration
 - Efficient query patterns
 - Connection pooling configuration
-
-### Scheduled Tasks (`*.cron.ts`)
-
-- Clearly defined execution intervals using cron syntax
-- Proper error handling and logging
-- Task isolation and single responsibility
-- Retry mechanisms for failed tasks
-- Proper cleanup after execution
-- Monitoring and alerting setup
-- Transaction handling for data consistency
-- Resource cleanup on completion
-- Clear task documentation
-- Consistent logging patterns
-- Error details in failure cases
-- Task status reporting
-- Proper service integration
-- Idempotent operations
