@@ -46,8 +46,7 @@ export const create = api(
 export const update = api(
   { expose: true, method: "PUT", path: "/articles/:id", auth: true },
   async (params: UpdateArticleRequest): Promise<UpdateArticleResponse> => {
-    await articleService.update(params);
-    return { message: "Article updated" };
+    return await articleService.update(params);
   }
 );
 
@@ -55,8 +54,7 @@ export const update = api(
 export const remove = api(
   { expose: true, method: "DELETE", path: "/articles/:id", auth: true },
   async ({ id }: DeleteArticleRequest): Promise<DeleteArticleResponse> => {
-    await articleService.delete(id);
-    return { message: "Article deleted" };
+    return await articleService.delete(id);
   }
 );
 
@@ -64,8 +62,7 @@ export const remove = api(
 export const publish = api(
   { expose: true, method: "POST", path: "/articles/:id/publish", auth: true },
   async ({ id }: PublishArticleRequest): Promise<PublishArticleResponse> => {
-    await articleService.publish(id);
-    return { message: "Article published" };
+    return await articleService.publish(id);
   }
 );
 
