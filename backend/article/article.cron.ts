@@ -4,6 +4,7 @@ import { api } from "encore.dev/api";
 import { CronJob } from "encore.dev/cron";
 import { google_chat } from "~encore/clients";
 
+// Sends a message to Google Chat with the number of published articles
 export const sendPublishedArticlesCount = api(
   {},
   async (): Promise<{ message: string }> => {
