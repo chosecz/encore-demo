@@ -12,8 +12,8 @@ export const users = pgTable("users", {
     .default(sql`uuid_generate_v4()`)
     .primaryKey()
     .notNull(),
-  email: text().notNull(),
-  googleId: text("google_id"),
+  email: text().notNull().unique(),
+  googleId: text("google_id").unique(),
   name: text(),
   picture: text(),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),

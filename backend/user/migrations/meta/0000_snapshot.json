@@ -128,31 +128,6 @@
       "checkConstraints": {},
       "policies": {},
       "isRLSEnabled": false
-    },
-    "public.schema_migrations": {
-      "name": "schema_migrations",
-      "schema": "",
-      "columns": {
-        "version": {
-          "name": "version",
-          "type": "bigint",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "dirty": {
-          "name": "dirty",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
     }
   },
   "enums": {},
