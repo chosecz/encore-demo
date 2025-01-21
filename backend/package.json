@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/busboy": "^1.5.4",
     "@types/node": "^20.5.7",
+    "@types/pg": "^8.11.10",
     "drizzle-kit": "^0.30.2",
     "typescript": "^5.2.2",
     "vite-tsconfig-paths": "^5.1.4",
