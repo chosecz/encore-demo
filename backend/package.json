@@ -20,7 +20,7 @@
   "dependencies": {
     "busboy": "^1.6.0",
     "drizzle-orm": "^0.38.4",
-    "encore.dev": "^1.45.7",
+    "encore.dev": "^1.46.0",
     "pg": "^8.13.1",
     "resend": "^4.0.1"
   },
