@@ -1,3 +1,4 @@
+import { TestExternalCallResponse } from "@article/article.interfaces";
 import {
   CreateSessionRequest,
   CreateUserRequest,
@@ -64,5 +65,23 @@ export const updateSessionExpiration = api(
   },
   async ({ id, expiresAt }: UpdateSessionExpirationRequest): Promise<void> => {
     await userService.updateSessionExpiration(id, expiresAt);
+  }
+);
+
+export const testExternalCall = api(
+  { expose: true, method: "GET", path: "/users/test-external-call" },
+  async (): Promise<TestExternalCallResponse> => {
+    const response = await fetch("https://sonic.fly.dev/api/calltest", {
+      method: "GET",
+      headers: {
+        "x-encore-header": "demo value of header from encore",
+      },
+    });
+    const data = await response.json();
+    return {
+      status: "success",
+      message: "External call successful",
+      data,
+    };
   }
 );

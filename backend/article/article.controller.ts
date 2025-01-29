@@ -11,6 +11,7 @@ import {
   PublishArticleRequest,
   PublishArticleResponse,
   PublishedArticlesCountResponse,
+  TestExternalCallResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "@article/article.interfaces";
@@ -79,5 +80,23 @@ export const upload = api.raw(
   { expose: true, method: "POST", path: "/article/upload", bodyLimit: null },
   async (req, res): Promise<FileUploadResponse> => {
     return await articleService.upload(req, res);
+  }
+);
+
+export const testExternalCall = api(
+  { expose: true, method: "GET", path: "/articles/test-external-call" },
+  async (): Promise<TestExternalCallResponse> => {
+    const response = await fetch("https://sonic.fly.dev/api/calltest", {
+      method: "GET",
+      headers: {
+        "x-encore-header": "demo value of header from encore",
+      },
+    });
+    const data = await response.json();
+    return {
+      status: "success",
+      message: "External call successful",
+      data,
+    };
   }
 );

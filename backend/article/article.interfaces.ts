@@ -132,3 +132,12 @@ export interface GetArticleRequest {
   // ID of the article
   id: string;
 }
+
+export interface TestExternalCallResponse {
+  // Status of the call
+  status: string;
+  // Message of the call
+  message: string;
+  // Data of the call
+  data: any;
+}
