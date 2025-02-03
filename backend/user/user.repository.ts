@@ -22,6 +22,10 @@ export class UserRepository {
     return user;
   }
 
+  async findAll(): Promise<GetUserResponse[]> {
+    return await db.select().from(_users);
+  }
+
   async findByGoogleId(googleId: string): Promise<GetUserResponse> {
     const [user] = await db
       .select()

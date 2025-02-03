@@ -32,6 +32,11 @@ export interface GetUserResponse {
   picture: string | null;
 }
 
+export interface GetUsersResponse {
+  // List of users
+  users: GetUserResponse[];
+}
+
 export interface UpdateUserRequest {
   // ID of the user
   id: string;

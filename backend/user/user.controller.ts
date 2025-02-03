@@ -7,6 +7,7 @@ import {
   GetUserFromGoogleIdRequest,
   GetUserRequest,
   GetUserResponse,
+  GetUsersResponse,
   SessionResponse,
   UpdateSessionExpirationRequest,
 } from "@user/user.interfaces";
@@ -82,6 +83,17 @@ export const testExternalCall = api(
       status: "success",
       message: "External call successful",
       data,
+    };
+  }
+);
+
+// Get all users
+export const getUsers = api(
+  { expose: false, method: "GET", path: "/users" },
+  async (): Promise<GetUsersResponse> => {
+    const users = await userService.getUsers();
+    return {
+      users,
     };
   }
 );

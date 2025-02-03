@@ -43,6 +43,10 @@ class UserService {
   async updateSessionExpiration(id: string, expiresAt: Date): Promise<void> {
     await userRepository.updateSessionExpiration(id, expiresAt);
   }
+
+  async getUsers(): Promise<GetUserResponse[]> {
+    return await userRepository.findAll();
+  }
 }
 
 export const userService = new UserService();
