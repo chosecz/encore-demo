@@ -8,11 +8,11 @@ export interface CreateArticleRequest {
   // Description of the article
   description: string;
   // ID of the author
-  author_id: string;
+  authorId: string;
   // Public URL of the article image
-  image_url?: string;
+  imageUrl?: string;
   // Bucket key of the article image
-  image_bucket_key?: string;
+  imageBucketKey?: string;
 }
 
 export interface CreateArticleResponse {
@@ -30,19 +30,19 @@ export interface Article {
   // Description of the article
   description: string;
   // Status of the article
-  status: "draft" | "published" | "archived";
+  status: string | "draft" | "published" | "archived";
   // ID of the author
-  author_id: string;
+  authorId: string;
   // Date the article was created
-  created_at: string;
+  createdAt: string;
   // Date the article was last updated
-  updated_at: string;
+  updatedAt: string;
   // Date the article was deleted
-  deleted_at: string | null;
+  deletedAt: string | null;
   // Public URL of the article image
-  image_url?: string;
+  imageUrl: string | null;
   // Bucket key of the article image
-  image_bucket_key?: string;
+  imageBucketKey: string | null;
 }
 
 export interface ArticleResponse extends Article {

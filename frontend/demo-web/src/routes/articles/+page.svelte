@@ -23,7 +23,7 @@
         <a href="/articles/{article.id}">{article.title}</a>
       </h2>
       <p>{article.description}</p>
-      {#if data.user?.id === article.author_id}
+      {#if data.user?.id === article.authorId}
         <p class="status">Status: {article.status}</p>
       {/if}
     </div>
@@ -97,20 +97,6 @@
     border-radius: 4px;
     font-family: inherit;
     font-size: inherit;
-  }
-
-  button {
-    background: #0066cc;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: inherit;
-  }
-
-  button:hover {
-    background: #0052a3;
   }
 
   .error {

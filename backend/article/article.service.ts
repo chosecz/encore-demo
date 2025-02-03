@@ -31,10 +31,10 @@ class ArticleService {
 
   async create(params: CreateArticleRequest): Promise<Article> {
     // check if user exists
-    const userExists = await user.getUser({ id: params.author_id });
+    const userExists = await user.getUser({ id: params.authorId });
     if (!userExists) {
       throw APIError.failedPrecondition(`User not found`).withDetails({
-        userId: params.author_id,
+        userId: params.authorId,
       });
     }
     return await articleRepository.create(params);
@@ -44,7 +44,7 @@ class ArticleService {
     const { userID = null } = getAuthData() || {};
 
     const article = await articleRepository.findById(params.id);
-    if (article.author_id !== userID) {
+    if (article.authorId !== userID) {
       throw APIError.permissionDenied(
         "Only the author can update this article"
       );
@@ -58,7 +58,7 @@ class ArticleService {
     const { userID = null } = getAuthData() || {};
 
     const article = await articleRepository.findById(id);
-    if (article.author_id !== userID) {
+    if (article.authorId !== userID) {
       throw APIError.permissionDenied(
         "Only the author can delete this article"
       );
@@ -76,7 +76,7 @@ class ArticleService {
     const { userID = null } = getAuthData() || {};
 
     // check if user is the author
-    if (article.author_id !== userID) {
+    if (article.authorId !== userID) {
       throw APIError.permissionDenied(
         "Only the author can publish this article"
       );

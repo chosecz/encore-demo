@@ -61,9 +61,9 @@ export const actions = {
       article = await client.article.create({
         title,
         description,
-        author_id: event.locals.user.id,
-        ...(imageUrl ? { image_url: imageUrl } : {}),
-        ...(imageBucketKey ? { image_bucket_key: imageBucketKey } : {}),
+        authorId: event.locals.user.id,
+        ...(imageUrl ? { imageUrl } : {}),
+        ...(imageBucketKey ? { imageBucketKey } : {}),
       });
     } catch (error) {
       return fail(500, {

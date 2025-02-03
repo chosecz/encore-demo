@@ -27,9 +27,9 @@ export interface GetUserResponse {
   // Email of the user
   email: string;
   // Name of the user
-  name: string;
+  name: string | null;
   // Public URL of the user's profile picture
-  picture: string;
+  picture: string | null;
 }
 
 export interface UpdateUserRequest {

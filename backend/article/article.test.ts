@@ -35,7 +35,7 @@ describe("Article API Tests", () => {
     const resp = await create({
       title: "Test Article",
       description: "This is a test article",
-      author_id: mockUserId(),
+      authorId: mockUserId(),
     });
     expect(resp.id).toBeDefined();
     testArticleId = resp.id;
